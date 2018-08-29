@@ -4,6 +4,10 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - content of this translation.
+    /// Words - a list of the words related to this translation.
+    /// </summary>
     public class Translation : EntityTable
     {
         [DataMember, Required]

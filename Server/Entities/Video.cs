@@ -5,6 +5,20 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - the title of this movie.
+    /// Description - the description of this video.
+    /// Mark - the quantity of marking stars for this video (NG - 5).
+    /// Year - the year of release.
+    /// Created - the time, when this video was added to the databse for the first time.
+    /// Path - the location of a 'Video' file.
+    /// SubPath - the location of subs file for this video.
+    /// ImgPath - the location of the poster.
+    /// IsAbsolulute - determinates if the location of file is absolute or not. If not - the file is in 'Videos/...'.
+    /// Categories - the list of videos categories.
+    /// Words - the list of words, related to this video.
+    /// Words - the list of words, related to this video.
+    /// </summary>
     public class Video : EntityTable
     {
         [DataMember, Required]
@@ -17,8 +31,6 @@ namespace Server.Entities
         public int? Year { get; set; } = null;
         [DataMember]
         public DateTime Created { get; set; } = DateTime.Today;
-        [DataMember]
-        public DateTime? Seen { get; set; } = null;
         [DataMember, Required]
         public string Path { get; set; }
         [DataMember, Required]

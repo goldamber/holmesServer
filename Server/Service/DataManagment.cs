@@ -90,8 +90,6 @@ namespace Server.Service
                             return video.Year.ToString();
                         case PropertyData.Created:
                             return video.Created.ToLongDateString();
-                        case PropertyData.Updated:
-                            return video.Seen == null ? null : video.Seen.Value.ToLongDateString();
                     }
                     break;
 
@@ -116,8 +114,6 @@ namespace Server.Service
                             return book.Year.ToString();
                         case PropertyData.Created:
                             return book.Created.ToLongDateString();
-                        case PropertyData.Updated:
-                            return book.Seen == null ? null : book.Seen.Value.ToLongDateString();
                     }
                     break;
                 case ServerData.User:
@@ -282,7 +278,7 @@ namespace Server.Service
 
             return null;
         }
-        public IEnumerable<int> GetFItems(string filter, ServerData data, FilerData fil)
+        public IEnumerable<int> GetFItems(string filter, ServerData data, PropertyData fil)
         {
             filter = filter.ToLower();
 
@@ -291,13 +287,13 @@ namespace Server.Service
                 case ServerData.Video:
                     switch (fil)
                     {
-                        case FilerData.Name:
+                        case PropertyData.Name:
                             return _context.Videos.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Description:
+                        case PropertyData.Description:
                             return _context.Videos.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Year:
+                        case PropertyData.Year:
                             return _context.Videos.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Category:
+                        case PropertyData.Category:
                             if (_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Videos.Where(v => v.Categories.Contains(_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
@@ -306,18 +302,18 @@ namespace Server.Service
                 case ServerData.Book:
                     switch (fil)
                     {
-                        case FilerData.Name:
+                        case PropertyData.Name:
                             return _context.Books.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Description:
+                        case PropertyData.Description:
                             return _context.Books.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Year:
+                        case PropertyData.Year:
                             return _context.Books.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
 
-                        case FilerData.Category:
+                        case PropertyData.Category:
                             if (_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Books.Where(v => v.Categories.Contains(_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
-                        case FilerData.Author:
+                        case PropertyData.Author:
                             if (_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Books.Where(v => v.Authors.Contains(_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
@@ -326,9 +322,9 @@ namespace Server.Service
                 case ServerData.User:
                     switch (fil)
                     {
-                        case FilerData.Name:
+                        case PropertyData.Name:
                             return _context.Users.Where(v => v.Username.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Role:
+                        case PropertyData.Role:
                             if (_context.Roles.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Users.Where(v => v.RoleID == _context.Roles.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault().Id).Select(f => f.Id).ToList();
@@ -341,24 +337,24 @@ namespace Server.Service
                 case ServerData.Word:
                     switch (fil)
                     {
-                        case FilerData.Name:
+                        case PropertyData.Name:
                             return _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
-                        case FilerData.Category:
+                        case PropertyData.Category:
                             if (_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter) || c.Abbreviation.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Dictionary.Where(v => v.Categories.Contains(_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter) || c.Abbreviation.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
 
-                        case FilerData.Synonyms:
+                        case PropertyData.Synonyms:
                             if (_context.Translations.Where(c => c.Name.ToLower() == filter).FirstOrDefault() == null && _context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault() == null)
                                 return null;
                             return _context.Translations.Where(c => c.Name.ToLower() == filter).FirstOrDefault() != null ? _context.Dictionary.Where(v => v.Translations.Contains(_context.Translations.Where(c => c.Name.ToLower() == filter).FirstOrDefault())).Select(f => f.Id).ToList() : _context.Dictionary.Where(v => v.Descriptions.Contains(_context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault())).Select(f => f.Id).ToList();
 
-                        case FilerData.Translation:
+                        case PropertyData.Translation:
                             if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)) == null)
                                 return null;
                             return _context.Dictionary.Where(w => w.Translations.Contains(_context.Translations.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(w => w.Id).ToList();
 
-                        case FilerData.Definition:
+                        case PropertyData.Definition:
                             if (_context.Definitions.Where(c => c.Name.ToLower().Contains(filter)) == null)
                                 return null;
                             return _context.Dictionary.Where(w => w.Descriptions.Contains(_context.Definitions.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(w => w.Id).ToList();

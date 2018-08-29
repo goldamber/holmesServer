@@ -4,6 +4,11 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - the name of this author.
+    /// Surname - the last name.
+    /// Books - a list of all books, related to this author.
+    /// </summary>
     public class Author : EntityTable
     {
         [DataMember, Required]

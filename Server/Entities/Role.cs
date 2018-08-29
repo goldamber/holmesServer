@@ -2,6 +2,9 @@
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - a name of users role.
+    /// </summary>
     public class Role : EntityTable
     {
         [DataMember]

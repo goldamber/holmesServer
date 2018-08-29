@@ -4,6 +4,15 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Avatar - an image of this client.
+    /// Username - login of this client.
+    /// Password - password of this client.
+    /// Level - level of this client. Depends on the quantity of played games and the score of each game.
+    /// RoleID - users role id.
+    /// Roles - users role.
+    /// Words - a list of words connected with this user.
+    /// </summary>
     public class User : EntityTable
     {
         [DataMember]

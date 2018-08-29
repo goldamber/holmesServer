@@ -4,6 +4,10 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - the name of this category.
+    /// Books - the list of books related to this category.
+    /// </summary>
     public class BookCategory : EntityTable
     {
         [DataMember, Required]

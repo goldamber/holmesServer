@@ -5,6 +5,20 @@ using System.Runtime.Serialization;
 
 namespace Server.Entities
 {
+    /// <summary>
+    /// Name - the title of this book.
+    /// Description - the description of this book.
+    /// Mark - the quantity of marking stars for this book (NG - 5).
+    /// Year - the year of release.
+    /// Created - the time, when this book was added to the databse for the first time.
+    /// Path - the location of a 'Book' file.
+    /// ImgPath - the location of the poster.
+    /// IsAbsolulute - determinates if the location of file is absolute or not. If not - the file is in 'Books/...'.
+    /// Categories - the list of books categories.
+    /// Words - the list of words, related to this book.
+    /// Words - the list of words, related to this book.
+    /// Authors - the list of authors, who wrote this book.
+    /// </summary>
     public class Book : EntityTable
     {
         [DataMember, Required]
@@ -17,8 +31,6 @@ namespace Server.Entities
         public int? Year { get; set; } = null;
         [DataMember]
         public DateTime Created { get; set; } = DateTime.Today;
-        [DataMember]
-        public DateTime? Seen { get; set; } = null;
         [DataMember, Required]
         public string Path { get; set; }
         [DataMember]

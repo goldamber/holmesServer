@@ -7,9 +7,14 @@ using System.Linq;
 
 namespace Server.Service
 {
+    /// <summary>
+    /// Types of data, that can be used for the general actions (insert, remove, edit, view).
+    /// </summary>
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark }
-    public enum FilerData { Name, Description, Category, Author, Role, Synonyms, Translation, Definition, Year }
-    public enum PropertyData { Name, Role, Description, Path, SubPath, Imgpath, Mark, Created, Updated, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm }
+    /// <summary>
+    /// Describes the properties, that have to be sent to the client.
+    /// </summary>
+    public enum PropertyData { Name, Role, Description, Path, SubPath, Imgpath, Mark, Created, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Author, Synonyms, Translation, Definition }
 
     public partial class EngService : IEngService
     {
@@ -29,9 +34,9 @@ namespace Server.Service
 
             return _context.Authors.Where(a => a.Name == name && a.Surname == surname).FirstOrDefault()?.Id;
         }
-        public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? year, DateTime created, DateTime? updated)
+        public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? year, DateTime created)
         {
-            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolulute = absolute, Created = created, Seen = updated, Mark = mark, Year = year });
+            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolulute = absolute, Created = created, Mark = mark, Year = year });
             _context.SaveChanges();
 
             return _context.Books.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -46,9 +51,9 @@ namespace Server.Service
 
             return _context.Users.Where(b => b.Username == login).FirstOrDefault()?.Id;
         }
-        public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? year, DateTime created, DateTime? updated)
+        public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? year, DateTime created)
         {
-            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolulute = absolute, Created = created, Seen = updated, Mark = mark, Year = year });
+            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolulute = absolute, Created = created, Mark = mark, Year = year });
             _context.SaveChanges();
 
             return _context.Videos.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -87,15 +92,14 @@ namespace Server.Service
                 case ServerData.VideoCategory:
                     if (_context.Videos.Where(u => u.Id == item).FirstOrDefault() == null || _context.VideoCategories.Where(u => u.Id == cat).FirstOrDefault() == null)
                         return;
-
                     _context.Videos.Where(u => u.Id == item).FirstOrDefault().Categories.Add(_context.VideoCategories.Where(u => u.Id == cat).FirstOrDefault());
                     break;
+
                 case ServerData.BookCategory:
                     Book book = (_context.Books.Where(u => u.Id == item).FirstOrDefault());
                     BookCategory bookCategory = _context.BookCategories.Where(u => u.Id == cat).FirstOrDefault();
                     if (book == null || bookCategory == null)
                         return;
-
                     book.Categories.Add(bookCategory);
                     break;
             }

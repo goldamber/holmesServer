@@ -82,11 +82,15 @@ namespace Server.Database
             #region Definitions. 
             context.Definitions.Add(new Definition { Name = "animal" });
             #endregion
+            #region Forms. 
+            context.WordForms.Add(new WordForm { PluralForm = "rabbits" });
+            #endregion
             context.SaveChanges();
             #region Words.
             Word word = new Word { Name = "rabbit" };
             word.Categories.Add(context.WordCategories.Where(t => t.Name == "Noun").FirstOrDefault());
             word.Categories.Add(context.WordCategories.Where(t => t.Name == "Countable noun").FirstOrDefault());
+            word.Form = context.WordForms.Where(wf => wf.PluralForm == "rabbits").FirstOrDefault();
             word.Translations.Add(context.Translations.Where(a => a.Name == "кролик").FirstOrDefault());
             word.Translations.Add(context.Translations.Where(a => a.Name == "заяц").FirstOrDefault());
             word.Descriptions.Add(context.Definitions.Where(a => a.Name == "animal").FirstOrDefault());

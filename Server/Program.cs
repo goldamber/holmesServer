@@ -25,7 +25,6 @@ namespace Server
                 Read();
 
                 serviceHost.Close();
-
                 WriteLine("Service is closed!");
             }
             catch (Exception ex)
