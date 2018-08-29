@@ -116,6 +116,18 @@ namespace Server.Service
                             return book.Created.ToLongDateString();
                     }
                     break;
+
+                case ServerData.Role:
+                    Role role = _context.Roles.Where(u => u.Id == id).FirstOrDefault();
+                    if (role == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return role.Name;
+                    }
+                    break;
+
                 case ServerData.User:
                     User user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
                     if (user == null)
@@ -293,6 +305,8 @@ namespace Server.Service
                             return _context.Videos.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Year:
                             return _context.Videos.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Mark:
+                            return _context.Videos.Where(v => v.Mark.ToString().Equals(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Category:
                             if (_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
@@ -308,6 +322,8 @@ namespace Server.Service
                             return _context.Books.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Year:
                             return _context.Books.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Mark:
+                            return _context.Books.Where(v => v.Mark.ToString().Equals(filter)).Select(f => f.Id).ToList();
 
                         case PropertyData.Category:
                             if (_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
