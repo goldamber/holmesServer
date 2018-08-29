@@ -60,6 +60,7 @@
     <Compile Include="Entities\BookCategory.cs" />
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\EntityTable.cs" />
+    <Compile Include="Entities\WordsGroup.cs" />
     <Compile Include="Service\DataManagment.cs" />
     <Compile Include="Entities\Example.cs" />
     <Compile Include="Entities\Role.cs" />

@@ -85,9 +85,9 @@ namespace Server.Service
                         case PropertyData.SubPath:
                             return video.SubPath;
                         case PropertyData.Mark:
-                            return video.Mark.ToString();
+                            return video.Mark == null ? null : video.Mark.ToString();
                         case PropertyData.Year:
-                            return video.Year.ToString();
+                            return video.Year == null? null: video.Year.ToString();
                         case PropertyData.Created:
                             return video.Created.ToLongDateString();
                     }
@@ -109,9 +109,9 @@ namespace Server.Service
                         case PropertyData.Imgpath:
                             return book.ImgPath;
                         case PropertyData.Mark:
-                            return book.Mark.ToString();
+                            return book.Mark == null ? null : book.Mark.ToString();
                         case PropertyData.Year:
-                            return book.Year.ToString();
+                            return book.Year == null ? null : book.Year.ToString();
                         case PropertyData.Created:
                             return book.Created.ToLongDateString();
                     }
@@ -308,6 +308,7 @@ namespace Server.Service
                         case PropertyData.Mark:
                             return _context.Videos.Where(v => v.Mark.ToString().Equals(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Category:
+                        case PropertyData.Categories:
                             if (_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Videos.Where(v => v.Categories.Contains(_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
@@ -326,13 +327,15 @@ namespace Server.Service
                             return _context.Books.Where(v => v.Mark.ToString().Equals(filter)).Select(f => f.Id).ToList();
 
                         case PropertyData.Category:
+                        case PropertyData.Categories:
                             if (_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Books.Where(v => v.Categories.Contains(_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
                         case PropertyData.Author:
-                            if (_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter)).FirstOrDefault() == null)
+                        case PropertyData.Authors:
+                            if (_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter) || (c.Name.ToLower() + " " + c.Surname.ToLower()).Equals(filter) || (c.Surname.ToLower() + " " + c.Name.ToLower()).Equals(filter)).FirstOrDefault() == null)
                                 return null;
-                            return _context.Books.Where(v => v.Authors.Contains(_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
+                            return _context.Books.Where(v => v.Authors.Contains(_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter) || (c.Name.ToLower() + " " + c.Surname.ToLower()).Equals(filter) || (c.Surname.ToLower() + " " + c.Name.ToLower()).Equals(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
                     }
                     break;
                 case ServerData.User:
@@ -356,6 +359,7 @@ namespace Server.Service
                         case PropertyData.Name:
                             return _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Category:
+                        case PropertyData.Categories:
                             if (_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter) || c.Abbreviation.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Dictionary.Where(v => v.Categories.Contains(_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter) || c.Abbreviation.ToLower().Contains(filter)).FirstOrDefault())).Select(f => f.Id).ToList();
@@ -366,11 +370,13 @@ namespace Server.Service
                             return _context.Translations.Where(c => c.Name.ToLower() == filter).FirstOrDefault() != null ? _context.Dictionary.Where(v => v.Translations.Contains(_context.Translations.Where(c => c.Name.ToLower() == filter).FirstOrDefault())).Select(f => f.Id).ToList() : _context.Dictionary.Where(v => v.Descriptions.Contains(_context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault())).Select(f => f.Id).ToList();
 
                         case PropertyData.Translation:
+                        case PropertyData.Translations:
                             if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)) == null)
                                 return null;
                             return _context.Dictionary.Where(w => w.Translations.Contains(_context.Translations.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(w => w.Id).ToList();
 
                         case PropertyData.Definition:
+                        case PropertyData.Definitions:
                             if (_context.Definitions.Where(c => c.Name.ToLower().Contains(filter)) == null)
                                 return null;
                             return _context.Dictionary.Where(w => w.Descriptions.Contains(_context.Definitions.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault())).Select(w => w.Id).ToList();
@@ -451,6 +457,8 @@ namespace Server.Service
                             return word.Translations.Select(c => c.Id);
                         case ServerData.Definition:
                             return word.Descriptions.Select(c => c.Id);
+                        case ServerData.Group:
+                            return word.Groups.Select(c => c.Id);
                         case ServerData.Example:
                             return _context.Examples.Where(e => e.WordID == word.Id).Select(e => e.Id);
                     }

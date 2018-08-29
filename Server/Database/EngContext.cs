@@ -22,5 +22,6 @@ namespace Server.Database
         public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<VideoBookmark> VideoBookmarks { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<WordsGroup> Groups { get; set; }
     }
 }

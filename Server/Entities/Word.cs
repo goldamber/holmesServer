@@ -15,6 +15,7 @@ namespace Server.Entities
     /// Videos - a list of videos, to which this word is connected.
     /// Books - a list of books, to which this word is connected.
     /// Users - a list of users, to whom this word is connected.
+    /// Groups - a list of groups, to whom this word is connected.
     /// </summary>
     public class Word : EntityTable
     {
@@ -40,6 +41,8 @@ namespace Server.Entities
         public virtual List<Book> Books { get; set; }
         [DataMember]
         public virtual List<User> Users { get; set; }
+        [DataMember]
+        public virtual List<WordsGroup> Groups { get; set; }
 
         public Word()
         {
@@ -49,6 +52,7 @@ namespace Server.Entities
             Videos = new List<Video>();
             Books = new List<Book>();
             Users = new List<User>();
+            Groups = new List<WordsGroup>();
         }
     }
 }

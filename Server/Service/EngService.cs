@@ -10,11 +10,11 @@ namespace Server.Service
     /// <summary>
     /// Types of data, that can be used for the general actions (insert, remove, edit, view).
     /// </summary>
-    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark }
+    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
     /// <summary>
     /// Describes the properties, that have to be sent to the client.
     /// </summary>
-    public enum PropertyData { Name, Role, Description, Path, SubPath, Imgpath, Mark, Created, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Author, Synonyms, Translation, Definition }
+    public enum PropertyData { Name, Role, Description, Path, SubPath, Imgpath, Mark, Created, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
 
     public partial class EngService : IEngService
     {
