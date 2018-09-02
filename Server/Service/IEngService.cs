@@ -81,7 +81,18 @@ namespace Server.Service
         [OperationContract]
         void AddBookAuthor(int bookId, int author);
         #endregion
-        
+        #region Edit.
+        /// <summary>
+        /// Changes data.
+        /// </summary>
+        /// <param name="id">Id of an item.</param>
+        /// <param name="changes">New data.</param>
+        /// <param name="data">Type of the item.</param>
+        /// <param name="property">Type of the property.</param>
+        [OperationContract]
+        void EditData(int id, string changes, ServerData data, PropertyData property);
+        #endregion
+
         #region Get data.
         /// <summary>
         /// Returns the property of an item.

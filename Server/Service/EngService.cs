@@ -106,6 +106,39 @@ namespace Server.Service
             _context.SaveChanges();
         }
         #endregion
+        #region Edit.
+        public void EditData(int id, string changes, ServerData data, PropertyData property)
+        {
+            switch (data)
+            {
+                case ServerData.User:
+                    User user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
+                    if (user == null)
+                        return;
+
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            user.Username = changes;
+                            break;
+                        case PropertyData.Role:
+                            user.Roles = _context.Roles.Where(r => r.Name == changes).FirstOrDefault();
+                            break;
+                        case PropertyData.Imgpath:
+                            user.Avatar = changes;
+                            break;
+                        case PropertyData.Password:
+                            user.Password = changes;
+                            break;
+                        case PropertyData.Level:
+                            user.Level = Convert.ToInt32(changes);
+                            break;
+                    }
+                    _context.SaveChanges();
+                    break;
+            }
+        }
+        #endregion
         #region Remove.
         public void RemoveItem(int id, ServerData data)
         {

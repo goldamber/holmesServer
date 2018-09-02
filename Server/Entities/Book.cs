@@ -16,7 +16,6 @@ namespace Server.Entities
     /// IsAbsolulute - determinates if the location of file is absolute or not. If not - the file is in 'Books/...'.
     /// Categories - the list of books categories.
     /// Words - the list of words, related to this book.
-    /// Words - the list of words, related to this book.
     /// Authors - the list of authors, who wrote this book.
     /// </summary>
     public class Book : EntityTable
