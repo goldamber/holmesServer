@@ -120,6 +120,14 @@ namespace Server.Service
         /// <returns>List of items' ids.</returns>
         [OperationContract]
         IEnumerable<int> GetFItems(string filter, ServerData data, PropertyData fil);
+        /// <summary>
+        /// Gets a list of all items sorted by specific propperty.
+        /// </summary>
+        /// <param name="data">The items' type.</param>
+        /// <param name="property">The selectors type.</param>
+        /// <returns>List of items' ids.</returns>
+        [OperationContract]
+        IEnumerable<int> GetSortedItems(ServerData data, PropertyData property, bool desc);
 
         /// <summary>
         /// Returns a list of the words related to a specific user and item (video or book).

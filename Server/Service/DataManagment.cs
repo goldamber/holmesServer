@@ -7,61 +7,6 @@ namespace Server.Service
 {
     public partial class EngService : IEngService
     {
-        #region Check.
-        public bool? CheckAbsolute(int id, ServerData data)
-        {
-            switch (data)
-            {
-                case ServerData.Video:
-                    Video tmp = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
-                    if (tmp == null)
-                        return null;
-
-                    return tmp.IsAbsolulute;
-
-                case ServerData.Book:
-                    Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
-                    if (book == null)
-                        return null;
-
-                    return book.IsAbsolulute;
-            }
-
-            return null;
-        }
-        public bool CheckExistence(string name, ServerData data)
-        {
-            switch (data)
-            {
-                case ServerData.Video:
-                    return _context.Videos.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.Book:
-                    return _context.Books.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.User:
-                    return _context.Users.Where(u => u.Username == name).FirstOrDefault() != null;
-                case ServerData.VideoCategory:
-                    return _context.VideoCategories.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.BookCategory:
-                    return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.Word:
-                    return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
-            }
-
-            return false;
-        }
-        public bool CheckAuthor(string name, string surname)
-        {
-            return _context.Authors.Where(u => u.Name == name && u.Surname == surname).FirstOrDefault() != null;
-        }        
-        public bool CheckUserPswd(string login, string pswd)
-        {
-            User tmp = _context.Users.Where(u => u.Username == login).FirstOrDefault();
-            if (tmp == null)
-                return false;
-
-            return tmp.Password == pswd;
-        }
-        #endregion
         #region Get data.
         public string GetItemProperty(int id, ServerData data, PropertyData property)
         {
@@ -135,6 +80,7 @@ namespace Server.Service
                     switch (property)
                     {
                         case PropertyData.Name:
+                        case PropertyData.Login:
                             return user.Username;
                         case PropertyData.Imgpath:
                             return user.Avatar;
@@ -144,6 +90,8 @@ namespace Server.Service
                             return user.Level.ToString();
                         case PropertyData.Role:
                             return user.RoleID.ToString();
+                        case PropertyData.RolesName:
+                            return _context.Roles.Where(r => r.Id == user.RoleID).FirstOrDefault()?.Name;
                     }
                     break;
                 case ServerData.VideoCategory:
@@ -265,7 +213,6 @@ namespace Server.Service
 
         public IEnumerable<int> GetItems(ServerData data)
         {
-            List<string> lst = new List<string>();
             switch (data)
             {
                 case ServerData.Video:
@@ -274,6 +221,8 @@ namespace Server.Service
                     return _context.Books.Select(f => f.Id).ToList();
                 case ServerData.User:
                     return _context.Users.Select(f => f.Id).ToList();
+                case ServerData.Role:
+                    return _context.Roles.Select(f => f.Id).ToList();
                 case ServerData.VideoCategory:
                     return _context.VideoCategories.Select(f => f.Id).ToList();
                 case ServerData.BookCategory:
@@ -342,8 +291,12 @@ namespace Server.Service
                     switch (fil)
                     {
                         case PropertyData.Name:
+                        case PropertyData.Login:
                             return _context.Users.Where(v => v.Username.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Level:
+                            return _context.Users.Where(v => v.Level.ToString().Equals(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Role:
+                        case PropertyData.RolesName:
                             if (_context.Roles.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
                                 return null;
                             return _context.Users.Where(v => v.RoleID == _context.Roles.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault().Id).Select(f => f.Id).ToList();
@@ -390,6 +343,72 @@ namespace Server.Service
 
             return null;
         }
+        public IEnumerable<int> GetSortedItems(ServerData data, PropertyData property, bool desc)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc? _context.Videos.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                        case PropertyData.Created:
+                        case PropertyData.Date:
+                            return desc ? _context.Videos.OrderByDescending(v => v.Created).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Created).Select(v => v.Id).ToList();
+                        case PropertyData.Year:
+                            return desc ? _context.Videos.OrderByDescending(v => v.Year).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Year).Select(v => v.Id).ToList();
+                        case PropertyData.Mark:
+                            return desc ? _context.Videos.OrderByDescending(v => v.Mark).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Mark).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.Book:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Books.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                        case PropertyData.Created:
+                        case PropertyData.Date:
+                            return desc ? _context.Books.OrderByDescending(v => v.Created).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Created).Select(v => v.Id).ToList();
+                        case PropertyData.Year:
+                            return desc ? _context.Books.OrderByDescending(v => v.Year).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Year).Select(v => v.Id).ToList();
+                        case PropertyData.Mark:
+                            return desc ? _context.Books.OrderByDescending(v => v.Mark).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Mark).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.User:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                        case PropertyData.Login:
+                            return desc ? _context.Users.OrderByDescending(v => v.Username).Select(v => v.Id).ToList() : _context.Users.OrderBy(v => v.Username).Select(v => v.Id).ToList();
+                        case PropertyData.Level:
+                            return desc ? _context.Users.OrderByDescending(v => v.Level).Select(v => v.Id).ToList() : _context.Users.OrderBy(v => v.Level).Select(v => v.Id).ToList();
+                        case PropertyData.Role:
+                            List<Role> roles = new List<Role>(_context.Roles);
+                            roles = desc? roles.OrderBy(r => r).ToList() : roles.OrderByDescending(r => r).ToList();
+                            List<int> users = new List<int>();
+                            foreach (Role item in roles)
+                            {
+                                foreach (User val in _context.Users)
+                                {
+                                    if (val.RoleID == item.Id && !users.Contains(val.Id))
+                                        users.Add(val.Id);
+                                }
+                            }
+                            return users;
+                    }
+                    break;
+                case ServerData.Word:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Dictionary.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Dictionary.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                    }
+                    break;
+            }
+
+            return null;
+        }
 
         public IEnumerable<int> GetUserItemWords(int user, int item, ServerData data)
         {
@@ -403,6 +422,7 @@ namespace Server.Service
                 case ServerData.Book:
                     if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Books.Where(u => u.Id == item).FirstOrDefault() == null)
                         return null;
+                    System.Console.WriteLine(_context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Books.Contains(_context.Books.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList().Count);
                     return _context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Books.Contains(_context.Books.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList();
 
                 default:

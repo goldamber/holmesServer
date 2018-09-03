@@ -22,6 +22,8 @@ namespace Server.Entities
         [DataMember, Required]
         public string Name { get; set; }
         [DataMember]
+        public string Transcription { get; set; } = null;
+        [DataMember]
         public string ImgPath { get; set; } = null;
 
         [DataMember]

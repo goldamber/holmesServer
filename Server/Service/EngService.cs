@@ -14,7 +14,7 @@ namespace Server.Service
     /// <summary>
     /// Describes the properties, that have to be sent to the client.
     /// </summary>
-    public enum PropertyData { Name, Role, Description, Path, SubPath, Imgpath, Mark, Created, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
+    public enum PropertyData { Name, Login, Role, RolesName, Description, Path, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
 
     public partial class EngService : IEngService
     {
@@ -137,6 +137,61 @@ namespace Server.Service
                     _context.SaveChanges();
                     break;
             }
+        }
+        #endregion
+        #region Check.
+        public bool? CheckAbsolute(int id, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    Video tmp = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
+                    if (tmp == null)
+                        return null;
+
+                    return tmp.IsAbsolulute;
+
+                case ServerData.Book:
+                    Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
+                    if (book == null)
+                        return null;
+
+                    return book.IsAbsolulute;
+            }
+
+            return null;
+        }
+        public bool CheckExistence(string name, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    return _context.Videos.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Book:
+                    return _context.Books.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.User:
+                    return _context.Users.Where(u => u.Username == name).FirstOrDefault() != null;
+                case ServerData.VideoCategory:
+                    return _context.VideoCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.BookCategory:
+                    return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Word:
+                    return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
+            }
+
+            return false;
+        }
+        public bool CheckAuthor(string name, string surname)
+        {
+            return _context.Authors.Where(u => u.Name == name && u.Surname == surname).FirstOrDefault() != null;
+        }
+        public bool CheckUserPswd(string login, string pswd)
+        {
+            User tmp = _context.Users.Where(u => u.Username == login).FirstOrDefault();
+            if (tmp == null)
+                return false;
+
+            return tmp.Password == pswd;
         }
         #endregion
         #region Remove.
