@@ -40,6 +40,11 @@ namespace Server.Database
             context.WordCategories.Add(new WordCategory { Name = "Preposition", Abbreviation = "p." });
             context.WordCategories.Add(new WordCategory { Name = "Conjunction", Abbreviation = "c." });
             context.WordCategories.Add(new WordCategory { Name = "Interjunction", Abbreviation = "i." });
+
+            context.WordCategories.Add(new WordCategory { Name = "Australian", Abbreviation = "au." });
+            context.WordCategories.Add(new WordCategory { Name = "Canadian", Abbreviation = "ca." });
+            context.WordCategories.Add(new WordCategory { Name = "American", Abbreviation = "us." });
+            context.WordCategories.Add(new WordCategory { Name = "British", Abbreviation = "uk." });
             #endregion
             #region Video.
             context.VideoCategories.Add(new VideoCategory { Name = "Movie" });
@@ -62,11 +67,11 @@ namespace Server.Database
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Comic").FirstOrDefault());
             context.Videos.Add(tmp);
 
-            tmp = new Video { Name = "Hobbit", Path = @"D:\My folder\Projects\English\I See Fire.mp4", SubPath = "I See Fire", IsAbsolulute = true, Description = "Ed Sheeran. I see Fire." };
+            tmp = new Video { Name = "Hobbit", Path = @"D:\My folder\Projects\English\I See Fire.mp4", SubPath = "I See Fire", IsAbsolute = true, Description = "Ed Sheeran. I see Fire." };
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Song").FirstOrDefault());
             context.Videos.Add(tmp);
 
-            tmp = new Video { Name = "Thor: Ragnarok", Path = @"http://89.150.0.90/scrt/102/2018022621353732_high_eng.mp4?md5=Qn8vxm2qssj0LYlC2JtYgA&expires=1527679499", SubPath = "Thor", IsAbsolulute = true };
+            tmp = new Video { Name = "Thor: Ragnarok", Path = @"http://89.150.0.90/scrt/102/2018022621353732_high_eng.mp4?md5=Qn8vxm2qssj0LYlC2JtYgA&expires=1527679499", SubPath = "Thor", IsAbsolute = true };
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Movie").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Marvel").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Comic").FirstOrDefault());
@@ -82,6 +87,9 @@ namespace Server.Database
             #region Definitions. 
             context.Definitions.Add(new Definition { Name = "animal" });
             #endregion
+            #region Transcriptions.
+            context.Transcriptions.Add(new Transcription { British = "ˈræbɪt", American = "ˈræbət", Australian = "ræbɪt", Canadian = "ræbɪt" });
+            #endregion
             #region Forms. 
             context.WordForms.Add(new WordForm { PluralForm = "rabbits" });
             #endregion
@@ -90,7 +98,12 @@ namespace Server.Database
             Word word = new Word { Name = "rabbit" };
             word.Categories.Add(context.WordCategories.Where(t => t.Name == "Noun").FirstOrDefault());
             word.Categories.Add(context.WordCategories.Where(t => t.Name == "Countable noun").FirstOrDefault());
+            word.Categories.Add(context.WordCategories.Where(t => t.Name == "Australian").FirstOrDefault());
+            word.Categories.Add(context.WordCategories.Where(t => t.Name == "British").FirstOrDefault());
+            word.Categories.Add(context.WordCategories.Where(t => t.Name == "Canadian").FirstOrDefault());
+            word.Categories.Add(context.WordCategories.Where(t => t.Name == "American").FirstOrDefault());
             word.Form = context.WordForms.Where(wf => wf.PluralForm == "rabbits").FirstOrDefault();
+            word.Transcriptions = context.Transcriptions.Where(t => t.British == "ˈræbɪt").FirstOrDefault();
             word.Translations.Add(context.Translations.Where(a => a.Name == "кролик").FirstOrDefault());
             word.Translations.Add(context.Translations.Where(a => a.Name == "заяц").FirstOrDefault());
             word.Descriptions.Add(context.Definitions.Where(a => a.Name == "animal").FirstOrDefault());
@@ -108,7 +121,7 @@ namespace Server.Database
             #endregion
             context.SaveChanges();
             #region Books.
-            Book _book = new Book { Name = "Watership Down", Path = @"D:\My folder\Projects\English\watershipdown.pdf", IsAbsolulute = true };            
+            Book _book = new Book { Name = "Watership Down", Path = @"D:\My folder\Projects\English\watershipdown.pdf", IsAbsolute = true };            
             _book.Words.Add(word);
             _book.Authors.Add(context.Authors.Where(a => a.Surname == "Adams").FirstOrDefault());
             _book.Categories.Add(context.BookCategories.Where(c => c.Name == "Novel").FirstOrDefault());

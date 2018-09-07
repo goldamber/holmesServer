@@ -11,8 +11,9 @@ namespace Server.Entities
     /// Mark - the quantity of marking stars for this book (NG - 5).
     /// Year - the year of release.
     /// Created - the time, when this book was added to the databse for the first time.
-    /// Path - the location of a 'Book' file. If NULL - the file is in 'Books/...'.
+    /// Path - the location of a 'Book' file.
     /// ImgPath - the location of the poster.
+    /// IsAbsolute - if the path is absolute or not. If not - the file is in 'Books/...'.
     /// Categories - the list of books categories.
     /// Words - the list of words, related to this book.
     /// Authors - the list of authors, who wrote this book.
@@ -29,10 +30,12 @@ namespace Server.Entities
         public int? Year { get; set; } = null;
         [DataMember]
         public DateTime Created { get; set; } = DateTime.Today;
-        [DataMember]
-        public string Path { get; set; } = null;
+        [DataMember, Required]
+        public string Path { get; set; }
         [DataMember]
         public string ImgPath { get; set; } = "WolfB.png";
+        [DataMember]
+        public bool IsAbsolute { get; set; } = false;
 
         [DataMember]
         public virtual List<BookCategory> Categories { get; set; }

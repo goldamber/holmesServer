@@ -9,6 +9,8 @@ namespace Server.Entities
     /// ImgPath - the content of this word.
     /// FormID - forms id.
     /// Form - the exceptional situations for this word (plural or past forms)content of this word.
+    /// TranscriptionID - transcriptions id.
+    /// Transcriptions - transcription for different accents.
     /// Categories - a list of categories for this word.
     /// Translations - a list of translations for this word.
     /// Descriptions - a list of definitions for this word.
@@ -22,14 +24,16 @@ namespace Server.Entities
         [DataMember, Required]
         public string Name { get; set; }
         [DataMember]
-        public string Transcription { get; set; } = null;
-        [DataMember]
         public string ImgPath { get; set; } = null;
 
         [DataMember]
         public int? FormID { get; set; }
         [DataMember]
         public WordForm Form { get; set; }
+        [DataMember]
+        public int? TranscriptionID { get; set; }
+        [DataMember]
+        public Transcription Transcriptions { get; set; }
 
         [DataMember]
         public List<WordCategory> Categories { get; set; }

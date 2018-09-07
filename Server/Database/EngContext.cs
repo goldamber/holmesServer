@@ -7,6 +7,7 @@ namespace Server.Database
     {
         public DbSet<Word> Dictionary { get; set; }
         public DbSet<WordForm> WordForms { get; set; }
+        public DbSet<Transcription> Transcriptions { get; set; }
         public DbSet<WordCategory> WordCategories { get; set; }
         public DbSet<Translation> Translations { get; set; }
         public DbSet<Example> Examples { get; set; }

@@ -36,7 +36,7 @@ namespace Server.Service
         }
         public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? year, DateTime created)
         {
-            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolulute = absolute, Created = created, Mark = mark, Year = year });
+            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolute = absolute, Created = created, Mark = mark, Year = year });
             _context.SaveChanges();
 
             return _context.Books.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -53,7 +53,7 @@ namespace Server.Service
         }
         public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? year, DateTime created)
         {
-            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolulute = absolute, Created = created, Mark = mark, Year = year });
+            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolute = absolute, Created = created, Mark = mark, Year = year });
             _context.SaveChanges();
 
             return _context.Videos.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -149,14 +149,14 @@ namespace Server.Service
                     if (tmp == null)
                         return null;
 
-                    return tmp.IsAbsolulute;
+                    return tmp.IsAbsolute;
 
                 case ServerData.Book:
                     Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
                     if (book == null)
                         return null;
 
-                    return book.IsAbsolulute;
+                    return book.IsAbsolute;
             }
 
             return null;

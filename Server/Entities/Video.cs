@@ -11,9 +11,10 @@ namespace Server.Entities
     /// Mark - the quantity of marking stars for this video (NG - 5).
     /// Year - the year of release.
     /// Created - the time, when this video was added to the databse for the first time.
-    /// Path - the location of a 'Video' file. If NULL - the file is in 'Videos/...'.
+    /// Path - the location of a 'Video' file.
     /// SubPath - the location of subs file for this video.
     /// ImgPath - the location of the poster.
+    /// IsAbsolute - if the path is absolute or not. If NULL - the file is in 'Videos/...'.
     /// Categories - the list of videos categories.
     /// Words - the list of words, related to this video.
     /// Words - the list of words, related to this video.
@@ -36,6 +37,8 @@ namespace Server.Entities
         public string SubPath { get; set; }
         [DataMember]
         public string ImgPath { get; set; } = "WolfV.png";
+        [DataMember]
+        public bool IsAbsolute { get; set; } = false;
 
         [DataMember]
         public virtual List<VideoCategory> Categories { get; set; }
