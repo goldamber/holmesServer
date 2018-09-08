@@ -93,6 +93,13 @@ namespace Server.Service
         void EditData(int id, string changes, ServerData data, PropertyData property);
         #endregion
 
+        #region Upload/Download.
+        [OperationContract]
+        bool Upload(byte[] file, string name, FilesType type);
+        [OperationContract]
+        byte[] Download(string name, FilesType type);
+        #endregion
+
         #region Get data.
         /// <summary>
         /// Returns the property of an item.

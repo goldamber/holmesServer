@@ -3,18 +3,17 @@ using Server.Entities;
 using System;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 
 namespace Server.Service
 {
-    /// <summary>
-    /// Types of data, that can be used for the general actions (insert, remove, edit, view).
-    /// </summary>
+    //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
-    /// <summary>
-    /// Describes the properties, that have to be sent to the client.
-    /// </summary>
+    //Describes the properties, that have to be sent to the client.
     public enum PropertyData { Name, Login, Role, RolesName, Description, Path, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
+    //Types of files to be uploaded or downloaded.
+    public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book }
 
     public partial class EngService : IEngService
     {
@@ -253,6 +252,80 @@ namespace Server.Service
                     break;
             }
             _context.SaveChanges();
+        }
+        #endregion
+
+        #region Upload/Download.
+        public byte[] Download(string name, FilesType type)
+        {
+            switch (type)
+            {
+                case FilesType.Video:
+                    return File.ReadAllBytes($@"Videos\{name}");
+                case FilesType.BookImage:
+                    return File.ReadAllBytes($@"BookImages\{name}");
+                case FilesType.WordImage:
+                    return File.ReadAllBytes($@"WordImages\{name}");
+                case FilesType.VideoImage:
+                    return File.ReadAllBytes($@"VideoImages\{name}");
+                case FilesType.Avatar:
+                    return File.ReadAllBytes($@"Avatars\{name}");
+                case FilesType.Book:
+                    return File.ReadAllBytes($@"Books\{name}");
+                default:
+                    return null;
+            }
+        }
+        public bool Upload(byte[] file, string name, FilesType type)
+        {
+            try
+            {
+                string fileName = "";
+                switch (type)
+                {
+                    case FilesType.Video:
+                        if (!Directory.Exists("Videos"))
+                            Directory.CreateDirectory("Videos");
+                        fileName = $@"Videos\{name}";
+                        break;
+                    case FilesType.BookImage:
+                        if (!Directory.Exists("BookImages"))
+                            Directory.CreateDirectory("BookImages");
+                        fileName = $@"BookImages\{name}";
+                        break;
+                    case FilesType.VideoImage:
+                        if (!Directory.Exists("VideoImages"))
+                            Directory.CreateDirectory("VideoImages");
+                        fileName = $@"VideoImages\{name}";
+                        break;
+                    case FilesType.Avatar:
+                        if (!Directory.Exists("Avatars"))
+                            Directory.CreateDirectory("Avatars");
+                        fileName = $@"Avatars\{name}";
+                        break;
+                    case FilesType.WordImage:
+                        if (!Directory.Exists("WordImages"))
+                            Directory.CreateDirectory("WordImages");
+                        fileName = $@"WordImages\{name}";
+                        break;
+                    case FilesType.Book:
+                        if (!Directory.Exists("Books"))
+                            Directory.CreateDirectory("Books");
+                        fileName = $@"Books\{name}";
+                        break;
+                }
+
+                using (FileStream fs = File.Create(fileName))
+                {
+                    fs.Write(file, 0, file.Length);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
         #endregion
     }
