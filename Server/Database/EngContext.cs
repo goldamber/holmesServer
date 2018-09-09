@@ -19,6 +19,8 @@ namespace Server.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Score> Scores { get; set; }
+        public DbSet<BookStar> BookStars { get; set; }
+        public DbSet<VideoStar> VideoStars { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<VideoBookmark> VideoBookmarks { get; set; }

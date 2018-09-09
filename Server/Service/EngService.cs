@@ -11,7 +11,7 @@ namespace Server.Service
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Login, Role, RolesName, Description, Path, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
+    public enum PropertyData { Name, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
     //Types of files to be uploaded or downloaded.
     public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book }
 
@@ -33,9 +33,12 @@ namespace Server.Service
 
             return _context.Authors.Where(a => a.Name == name && a.Surname == surname).FirstOrDefault()?.Id;
         }
-        public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? year, DateTime created)
+        public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? user, int? year, DateTime created)
         {
-            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolute = absolute, Created = created, Mark = mark, Year = year });
+            _context.Books.Add(new Book { Name = name, Description = (desc == "" ? null : desc), Path = path, ImgPath = img, IsAbsolute = absolute, Created = created, Year = year });
+            _context.SaveChanges();
+            if (mark != null)
+                _context.BookStars.Add(new BookStar { MarkCount = Convert.ToInt32(mark), BookID = _context.Books.Where(v => v.Name == name).FirstOrDefault().Id, UserID = Convert.ToInt32(user) });
             _context.SaveChanges();
 
             return _context.Books.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -50,9 +53,12 @@ namespace Server.Service
 
             return _context.Users.Where(b => b.Username == login).FirstOrDefault()?.Id;
         }
-        public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? year, DateTime created)
+        public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? user, int? year, DateTime created)
         {
-            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolute = absolute, Created = created, Mark = mark, Year = year });
+            _context.Videos.Add(new Video { Name = name, Description = (desc == "" ? null : desc), Path = path, SubPath = sub, ImgPath = img, IsAbsolute = absolute, Created = created, Year = year });
+            _context.SaveChanges();
+            if (mark != null)
+                _context.VideoStars.Add(new VideoStar { MarkCount = Convert.ToInt32(mark), VideoID = _context.Videos.Where(v => v.Name == name).FirstOrDefault().Id, UserID = Convert.ToInt32(user) });
             _context.SaveChanges();
 
             return _context.Videos.Where(b => b.Name == name).FirstOrDefault()?.Id;
@@ -114,7 +120,6 @@ namespace Server.Service
                     User user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
                     if (user == null)
                         return;
-
                     switch (property)
                     {
                         case PropertyData.Name:
@@ -133,9 +138,57 @@ namespace Server.Service
                             user.Level = Convert.ToInt32(changes);
                             break;
                     }
-                    _context.SaveChanges();
+                    break;
+
+                case ServerData.Book:
+                    Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
+                    if (book == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            book.Name = changes;
+                            break;
+                        case PropertyData.Description:
+                            book.Description = changes;
+                            break;
+                        case PropertyData.Path:
+                            book.Path = changes;
+                            break;
+                        case PropertyData.Imgpath:
+                            book.ImgPath = changes;
+                            break;
+                        case PropertyData.Year:
+                            book.Year = Convert.ToInt32(changes);
+                            break;
+                        case PropertyData.IsAbsolute:
+                            book.IsAbsolute = changes != null;
+                            break;
+                    }
                     break;
             }
+            _context.SaveChanges();
+        }
+        public void EditMark(int id, int usersId, int changes, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    VideoStar video = _context.VideoStars.Where(v => v.VideoID == id && v.UserID == usersId).FirstOrDefault();
+                    if (video == null)
+                        _context.VideoStars.Add(new VideoStar { MarkCount = changes, UserID = usersId, VideoID = id });
+                    else
+                        video.MarkCount = changes;
+                    break;
+                case ServerData.Book:
+                    BookStar book = _context.BookStars.Where(b => b.BookID == id && b.UserID == usersId).FirstOrDefault();
+                    if (book == null)
+                        _context.BookStars.Add(new BookStar { MarkCount = changes, UserID = usersId, BookID = id });
+                    else
+                        book.MarkCount = changes;
+                    break;
+            }
+            _context.SaveChanges();
         }
         #endregion
         #region Check.
@@ -226,6 +279,22 @@ namespace Server.Service
             
             _context.SaveChanges();
         }
+        public void RemoveFullItemData(int id, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.VideoCategory:
+                    _context.Videos.Where(v => v.Id == id).FirstOrDefault()?.Categories.Clear();
+                    break;
+                case ServerData.BookCategory:
+                    _context.Books.Where(b => b.Id == id).FirstOrDefault()?.Categories.Clear();
+                    break;
+                case ServerData.Author:
+                    _context.Books.Where(b => b.Id == id).FirstOrDefault()?.Authors.Clear();
+                    break;
+            }
+            _context.SaveChanges();
+        }
         public void RemoveItemWord(int item, int word, ServerData data)
         {
             if (_context.Dictionary.Where(u => u.Id == word).FirstOrDefault() == null)
@@ -261,17 +330,29 @@ namespace Server.Service
             switch (type)
             {
                 case FilesType.Video:
-                    return File.ReadAllBytes($@"Videos\{name}");
+                    if (File.Exists($@"Videos\{name}"))
+                        return File.ReadAllBytes($@"Videos\{name}");
+                    return null;
                 case FilesType.BookImage:
-                    return File.ReadAllBytes($@"BookImages\{name}");
+                    if (File.Exists($@"BookImages\{name}"))
+                        return File.ReadAllBytes($@"BookImages\{name}");
+                    return null;
                 case FilesType.WordImage:
-                    return File.ReadAllBytes($@"WordImages\{name}");
+                    if (File.Exists($@"WordImages\{name}"))
+                        return File.ReadAllBytes($@"WordImages\{name}");
+                    return null;
                 case FilesType.VideoImage:
-                    return File.ReadAllBytes($@"VideoImages\{name}");
+                    if (File.Exists($@"VideoImages\{name}"))
+                        return File.ReadAllBytes($@"VideoImages\{name}");
+                    return null;
                 case FilesType.Avatar:
-                    return File.ReadAllBytes($@"Avatars\{name}");
+                    if (File.Exists($@"Avatars\{name}"))
+                        return File.ReadAllBytes($@"Avatars\{name}");
+                    return null;
                 case FilesType.Book:
-                    return File.ReadAllBytes($@"Books\{name}");
+                    if (File.Exists($@"Books\{name}"))
+                        return File.ReadAllBytes($@"Books\{name}");
+                    return null;
                 default:
                     return null;
             }
@@ -325,6 +406,36 @@ namespace Server.Service
             {
                 Console.WriteLine(ex.Message);
                 return false;
+            }
+        }
+        public void Delete(string name, FilesType type)
+        {
+            switch (type)
+            {
+                case FilesType.Video:
+                    if (File.Exists($@"Videos\{name}"))
+                        File.Delete($@"Videos\{name}");
+                    break;
+                case FilesType.BookImage:
+                    if (File.Exists($@"BookImages\{name}"))
+                        File.Delete($@"BookImages\{name}");
+                    break;
+                case FilesType.WordImage:
+                    if (File.Exists($@"WordImages\{name}"))
+                        File.Delete($@"WordImages\{name}");
+                    break;
+                case FilesType.VideoImage:
+                    if (File.Exists($@"VideoImages\{name}"))
+                        File.Delete($@"VideoImages\{name}");
+                    break;
+                case FilesType.Avatar:
+                    if (File.Exists($@"Avatars\{name}"))
+                        File.Delete($@"Avatars\{name}");
+                    break;
+                case FilesType.Book:
+                    if (File.Exists($@"Books\{name}"))
+                        File.Delete($@"Books\{name}");
+                    break;
             }
         }
         #endregion

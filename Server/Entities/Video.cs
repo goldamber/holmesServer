@@ -8,7 +8,6 @@ namespace Server.Entities
     /// <summary>
     /// Name - the title of this movie.
     /// Description - the description of this video.
-    /// Mark - the quantity of marking stars for this video (NG - 5).
     /// Year - the year of release.
     /// Created - the time, when this video was added to the databse for the first time.
     /// Path - the location of a 'Video' file.
@@ -25,8 +24,6 @@ namespace Server.Entities
         public string Name { get; set; }
         [DataMember]
         public string Description { get; set; }
-        [DataMember]
-        public int? Mark { get; set; } = null;
         [DataMember]
         public int? Year { get; set; } = null;
         [DataMember]

@@ -33,7 +33,7 @@ namespace Server.Service
         /// <param name="created">The date of creation (in DB).</param>
         /// <returns>Returns the Id of added 'Video' item, if the operation succeeded.</returns>
         [OperationContract]
-        int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? year, DateTime created);
+        int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? user, int? year, DateTime created);
         /// <summary>
         /// Inserts a new 'Book' item.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Server.Service
         /// <param name="created">The date of creation (in DB).</param>
         /// <returns>Returns the Id of an added 'Book' item, if the operation succeeded.</returns>
         [OperationContract]
-        int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? year, DateTime created);
+        int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? user, int? year, DateTime created);
         /// <summary>
         /// Inserts a new author into the database.
         /// </summary>
@@ -91,13 +91,42 @@ namespace Server.Service
         /// <param name="property">Type of the property.</param>
         [OperationContract]
         void EditData(int id, string changes, ServerData data, PropertyData property);
+        /// <summary>
+        /// Changes rating.
+        /// </summary>
+        /// <param name="id">Items id.</param>
+        /// <param name="usersId">Users id.</param>
+        /// <param name="changes">New rating.</param>
+        /// <param name="data">Items type.</param>
+        [OperationContract]
+        void EditMark(int id, int usersId, int changes, ServerData data);
         #endregion
 
-        #region Upload/Download.
+        #region Files.
+        /// <summary>
+        /// Uploads a new file.
+        /// </summary>
+        /// <param name="file">Array of bytes to be ulodaed.</param>
+        /// <param name="name">The name of new file.</param>
+        /// <param name="type">Type of file to be uploaded.</param>
+        /// <returns></returns>
         [OperationContract]
         bool Upload(byte[] file, string name, FilesType type);
+        /// <summary>
+        /// Downloads a file from server.
+        /// </summary>
+        /// <param name="name">Files name.</param>
+        /// <param name="type">Files type.</param>
+        /// <returns></returns>
         [OperationContract]
         byte[] Download(string name, FilesType type);
+        /// <summary>
+        /// Deltes file from server.
+        /// </summary>
+        /// <param name="name">Files name.</param>
+        /// <param name="type">Files type.</param>
+        [OperationContract]
+        void Delete(string name, FilesType type);
         #endregion
 
         #region Get data.
@@ -110,6 +139,15 @@ namespace Server.Service
         /// <returns>The properties data coverted ro string.</returns>
         [OperationContract]
         string GetItemProperty(int id, ServerData data, PropertyData property);
+        /// <summary>
+        /// Returns the items mark.
+        /// </summary>
+        /// <param name="itemId">Items id.</param>
+        /// <param name="userId">Users id.</param>
+        /// <param name="data">Items type.</param>
+        /// <returns>The quantity of marking stars.</returns>
+        [OperationContract]
+        int? GetMark(int itemId, int userId, ServerData data);
 
         /// <summary>
         /// Gets a list of all items.
@@ -220,6 +258,13 @@ namespace Server.Service
         /// <param name="data">The type of an item (Video, Book, ...).</param>
         [OperationContract]
         void RemoveItem(int id, ServerData data);
+        /// <summary>
+        /// Removes all data related to specific item.
+        /// </summary>
+        /// <param name="id">Items id.</param>
+        /// <param name="data">Items type.</param>
+        [OperationContract]
+        void RemoveFullItemData(int id, ServerData data);
         /// <summary>
         /// Removes words from users, videos or books.
         /// </summary>

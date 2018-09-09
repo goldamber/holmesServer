@@ -8,7 +8,6 @@ namespace Server.Entities
     /// <summary>
     /// Name - the title of this book.
     /// Description - the description of this book.
-    /// Mark - the quantity of marking stars for this book (NG - 5).
     /// Year - the year of release.
     /// Created - the time, when this book was added to the databse for the first time.
     /// Path - the location of a 'Book' file.
@@ -24,8 +23,6 @@ namespace Server.Entities
         public string Name { get; set; }
         [DataMember]
         public string Description { get; set; }
-        [DataMember]
-        public int? Mark { get; set; } = null;
         [DataMember]
         public int? Year { get; set; } = null;
         [DataMember]

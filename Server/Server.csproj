@@ -59,7 +59,9 @@
     <Compile Include="Entities\Book.cs" />
     <Compile Include="Entities\BookCategory.cs" />
     <Compile Include="Entities\Bookmark.cs" />
+    <Compile Include="Entities\BookStar.cs" />
     <Compile Include="Entities\EntityTable.cs" />
+    <Compile Include="Entities\VideoStar.cs" />
     <Compile Include="Entities\Transcription.cs" />
     <Compile Include="Entities\WordsGroup.cs" />
     <Compile Include="Service\DataManagment.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Entities\Word.cs" />
     <Compile Include="Entities\WordForm.cs" />
     <Compile Include="Entities\WordCategory.cs" />
+    <Compile Include="Service\ListsManagment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

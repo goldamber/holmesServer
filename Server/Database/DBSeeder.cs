@@ -17,6 +17,12 @@ namespace Server.Database
             User val = new User { Username = "John", Password = "221BCA" };
             val.Roles = context.Roles.Where(c => c.Name == "admin").FirstOrDefault();
             context.Users.Add(val);
+            val = new User { Username = "Dan", Password = "111111" };
+            val.Roles = context.Roles.Where(c => c.Name == "admin").FirstOrDefault();
+            context.Users.Add(val);
+            val = new User { Username = "Orca", Password = "123456" };
+            val.Roles = context.Roles.Where(c => c.Name == "user").FirstOrDefault();
+            context.Users.Add(val);
             #endregion
 
             #region Categories.
@@ -40,6 +46,7 @@ namespace Server.Database
             context.WordCategories.Add(new WordCategory { Name = "Preposition", Abbreviation = "p." });
             context.WordCategories.Add(new WordCategory { Name = "Conjunction", Abbreviation = "c." });
             context.WordCategories.Add(new WordCategory { Name = "Interjunction", Abbreviation = "i." });
+            context.WordCategories.Add(new WordCategory { Name = "Idiom", Abbreviation = "id." });
 
             context.WordCategories.Add(new WordCategory { Name = "Australian", Abbreviation = "au." });
             context.WordCategories.Add(new WordCategory { Name = "Canadian", Abbreviation = "ca." });
@@ -57,8 +64,8 @@ namespace Server.Database
             context.BookCategories.Add(new BookCategory { Name = "Poem" });
             context.BookCategories.Add(new BookCategory { Name = "Novel" });
             #endregion
-            context.SaveChanges();
             #endregion
+            context.SaveChanges();
 
             #region Videos.
             Video tmp = new Video { Name = "Avengers: trailer", Path = "Avengers.mp4", SubPath = "Avengers" };
@@ -131,6 +138,12 @@ namespace Server.Database
             _book.Authors.Add(context.Authors.Where(a => a.Surname == "Byron").FirstOrDefault());
             _book.Categories.Add(context.BookCategories.Where(c => c.Name == "Poem").FirstOrDefault());
             context.Books.Add(_book);
+            #endregion
+            context.SaveChanges();
+
+            #region Marking stars.
+            context.VideoStars.Add(new VideoStar { MarkCount = 2, UserName = val, VideoName = tmp });
+            context.BookStars.Add(new BookStar { MarkCount = 3, UserName = val, BookName = _book });
             #endregion
             context.SaveChanges();
 
