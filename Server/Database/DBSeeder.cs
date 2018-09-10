@@ -68,17 +68,17 @@ namespace Server.Database
             context.SaveChanges();
 
             #region Videos.
-            Video tmp = new Video { Name = "Avengers: trailer", Path = "Avengers.mp4", SubPath = "Avengers" };
+            Video tmp = new Video { Id = 1, Name = "Avengers: trailer", Path = "1.mp4", SubPath = "1.srt" };
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Trailer").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Marvel").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Comic").FirstOrDefault());
             context.Videos.Add(tmp);
 
-            tmp = new Video { Name = "Hobbit", Path = @"D:\My folder\Projects\English\I See Fire.mp4", SubPath = "I See Fire", IsAbsolute = true, Description = "Ed Sheeran. I see Fire." };
+            tmp = new Video { Id = 2, Name = "Hobbit", Path = "2.mp4", SubPath = "2.srt", IsAbsolute = true, Description = "Ed Sheeran. I see Fire." };
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Song").FirstOrDefault());
             context.Videos.Add(tmp);
 
-            tmp = new Video { Name = "Thor: Ragnarok", Path = @"http://89.150.0.90/scrt/102/2018022621353732_high_eng.mp4?md5=Qn8vxm2qssj0LYlC2JtYgA&expires=1527679499", SubPath = "Thor", IsAbsolute = true };
+            tmp = new Video { Id = 3, Name = "Thor: Ragnarok", Path = @"http://89.150.0.90/scrt/102/2018022621353732_high_eng.mp4?md5=Qn8vxm2qssj0LYlC2JtYgA&expires=1527679499", SubPath = "3.srt", IsAbsolute = true };
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Movie").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Marvel").FirstOrDefault());
             tmp.Categories.Add(context.VideoCategories.Where(c => c.Name == "Comic").FirstOrDefault());
@@ -128,13 +128,13 @@ namespace Server.Database
             #endregion
             context.SaveChanges();
             #region Books.
-            Book _book = new Book { Name = "Watership Down", Path = @"D:\My folder\Projects\English\watershipdown.pdf", IsAbsolute = true };            
+            Book _book = new Book { Id = 1, Name = "Watership Down", Path = @"1.pdf" };            
             _book.Words.Add(word);
             _book.Authors.Add(context.Authors.Where(a => a.Surname == "Adams").FirstOrDefault());
             _book.Categories.Add(context.BookCategories.Where(c => c.Name == "Novel").FirstOrDefault());
             context.Books.Add(_book);
 
-            _book = new Book { Name = "I would I were a careless child", Path = "Child.txt" };
+            _book = new Book { Id = 2, Name = "I would I were a careless child", Path = "2.txt" };
             _book.Authors.Add(context.Authors.Where(a => a.Surname == "Byron").FirstOrDefault());
             _book.Categories.Add(context.BookCategories.Where(c => c.Name == "Poem").FirstOrDefault());
             context.Books.Add(_book);

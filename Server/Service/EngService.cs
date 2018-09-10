@@ -153,13 +153,20 @@ namespace Server.Service
                             book.Description = changes;
                             break;
                         case PropertyData.Path:
+                            if (File.Exists($@"Books\{book.Path}") && book.IsAbsolute == false)
+                                File.Delete($@"Books\{book.Path}");
                             book.Path = changes;
                             break;
                         case PropertyData.Imgpath:
+                            if (File.Exists($@"BookImages\{book.ImgPath}"))
+                                File.Delete($@"BookImages\{book.ImgPath}");
                             book.ImgPath = changes;
                             break;
                         case PropertyData.Year:
-                            book.Year = Convert.ToInt32(changes);
+                            if (changes == null)
+                                book.Year = null;
+                            else
+                                book.Year = Convert.ToInt32(changes);
                             break;
                         case PropertyData.IsAbsolute:
                             book.IsAbsolute = changes != null;
@@ -399,6 +406,7 @@ namespace Server.Service
                 using (FileStream fs = File.Create(fileName))
                 {
                     fs.Write(file, 0, file.Length);
+                    fs.Dispose();
                 }
                 return true;
             }
