@@ -179,6 +179,29 @@ namespace Server.Service
                             return desc ? _context.Books.OrderByDescending(v => v.Year).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Year).Select(v => v.Id).ToList();
                     }
                     break;
+                case ServerData.Author:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Authors.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Authors.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                        case PropertyData.Surname:
+                            return desc ? _context.Authors.OrderByDescending(v => v.Surname).Select(v => v.Id).ToList() : _context.Authors.OrderBy(v => v.Surname).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.BookCategory:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.BookCategories.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.BookCategories.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.VideoCategory:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.VideoCategories.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.VideoCategories.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                    }
+                    break;
                 case ServerData.User:
                     switch (property)
                     {
@@ -284,6 +307,18 @@ namespace Server.Service
                             return word.Groups.Select(c => c.Id);
                         case ServerData.Example:
                             return _context.Examples.Where(e => e.WordID == word.Id).Select(e => e.Id);
+                    }
+                    break;
+
+                case ServerData.Author:
+                    Author author = _context.Authors.Where(u => u.Id == id).FirstOrDefault();
+                    if (author == null)
+                        return null;
+
+                    switch (res)
+                    {
+                        case ServerData.Book:
+                            return author.Books.Select(c => c.Id);
                     }
                     break;
             }

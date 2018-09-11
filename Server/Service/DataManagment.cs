@@ -172,7 +172,9 @@ namespace Server.Service
                     switch (property)
                     {
                         case PropertyData.Name:
-                            return author.Name + " " + author.Surname;
+                            return author.Name;
+                        case PropertyData.Surname:
+                            return author.Surname;
                     }
                     break;
                 case ServerData.Game:
@@ -217,6 +219,61 @@ namespace Server.Service
                 default:
                     return null;
             }
+        }
+        #endregion
+        #region Check.
+        public bool? CheckAbsolute(int id, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    Video tmp = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
+                    if (tmp == null)
+                        return null;
+
+                    return tmp.IsAbsolute;
+
+                case ServerData.Book:
+                    Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
+                    if (book == null)
+                        return null;
+
+                    return book.IsAbsolute;
+            }
+
+            return null;
+        }
+        public bool CheckExistence(string name, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    return _context.Videos.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Book:
+                    return _context.Books.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.User:
+                    return _context.Users.Where(u => u.Username == name).FirstOrDefault() != null;
+                case ServerData.VideoCategory:
+                    return _context.VideoCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.BookCategory:
+                    return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Word:
+                    return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
+            }
+
+            return false;
+        }
+        public bool CheckAuthor(string name, string surname)
+        {
+            return _context.Authors.Where(u => u.Name == name && u.Surname == surname).FirstOrDefault() != null;
+        }
+        public bool CheckUserPswd(string login, string pswd)
+        {
+            User tmp = _context.Users.Where(u => u.Username == login).FirstOrDefault();
+            if (tmp == null)
+                return false;
+
+            return tmp.Password == pswd;
         }
         #endregion
     }

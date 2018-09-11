@@ -11,9 +11,9 @@ namespace Server.Service
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
+    public enum PropertyData { Name, Surname, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
     //Types of files to be uploaded or downloaded.
-    public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book }
+    public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book, Subtitles }
 
     public partial class EngService : IEngService
     {
@@ -173,6 +173,33 @@ namespace Server.Service
                             break;
                     }
                     break;
+
+                case ServerData.Author:
+                    Author author = _context.Authors.Where(u => u.Id == id).FirstOrDefault();
+                    if (author == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            author.Name = changes;
+                            break;
+                        case PropertyData.Surname:
+                            author.Surname = changes;
+                            break;
+                    }
+                    break;
+
+                case ServerData.BookCategory:
+                    BookCategory bc = _context.BookCategories.Where(u => u.Id == id).FirstOrDefault();
+                    if (bc == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            bc.Name = changes;
+                            break;
+                    }
+                    break;
             }
             _context.SaveChanges();
         }
@@ -198,61 +225,6 @@ namespace Server.Service
             _context.SaveChanges();
         }
         #endregion
-        #region Check.
-        public bool? CheckAbsolute(int id, ServerData data)
-        {
-            switch (data)
-            {
-                case ServerData.Video:
-                    Video tmp = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
-                    if (tmp == null)
-                        return null;
-
-                    return tmp.IsAbsolute;
-
-                case ServerData.Book:
-                    Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
-                    if (book == null)
-                        return null;
-
-                    return book.IsAbsolute;
-            }
-
-            return null;
-        }
-        public bool CheckExistence(string name, ServerData data)
-        {
-            switch (data)
-            {
-                case ServerData.Video:
-                    return _context.Videos.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.Book:
-                    return _context.Books.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.User:
-                    return _context.Users.Where(u => u.Username == name).FirstOrDefault() != null;
-                case ServerData.VideoCategory:
-                    return _context.VideoCategories.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.BookCategory:
-                    return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
-                case ServerData.Word:
-                    return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
-            }
-
-            return false;
-        }
-        public bool CheckAuthor(string name, string surname)
-        {
-            return _context.Authors.Where(u => u.Name == name && u.Surname == surname).FirstOrDefault() != null;
-        }
-        public bool CheckUserPswd(string login, string pswd)
-        {
-            User tmp = _context.Users.Where(u => u.Username == login).FirstOrDefault();
-            if (tmp == null)
-                return false;
-
-            return tmp.Password == pswd;
-        }
-        #endregion
         #region Remove.
         public void RemoveItem(int id, ServerData data)
         {
@@ -265,6 +237,10 @@ namespace Server.Service
                 case ServerData.Book:
                     if (_context.Books.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Books.Remove(_context.Books.Where(b => b.Id == id).FirstOrDefault());
+                    break;
+                case ServerData.Author:
+                    if (_context.Authors.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Authors.Remove(_context.Authors.Where(b => b.Id == id).FirstOrDefault());
                     break;
                 case ServerData.User:
                     if (_context.Users.Where(b => b.Id == id).FirstOrDefault() != null)
@@ -340,6 +316,10 @@ namespace Server.Service
                     if (File.Exists($@"Videos\{name}"))
                         return File.ReadAllBytes($@"Videos\{name}");
                     return null;
+                case FilesType.Subtitles:
+                    if (File.Exists($@"Subtitles\{name}"))
+                        return File.ReadAllBytes($@"Subtitles\{name}");
+                    return null;
                 case FilesType.BookImage:
                     if (File.Exists($@"BookImages\{name}"))
                         return File.ReadAllBytes($@"BookImages\{name}");
@@ -375,6 +355,11 @@ namespace Server.Service
                         if (!Directory.Exists("Videos"))
                             Directory.CreateDirectory("Videos");
                         fileName = $@"Videos\{name}";
+                        break;
+                    case FilesType.Subtitles:
+                        if (!Directory.Exists("Subtitles"))
+                            Directory.CreateDirectory("Subtitles");
+                        fileName = $@"Subtitles\{name}";
                         break;
                     case FilesType.BookImage:
                         if (!Directory.Exists("BookImages"))
@@ -423,6 +408,10 @@ namespace Server.Service
                 case FilesType.Video:
                     if (File.Exists($@"Videos\{name}"))
                         File.Delete($@"Videos\{name}");
+                    break;
+                case FilesType.Subtitles:
+                    if (File.Exists($@"Subtitles\{name}"))
+                        File.Delete($@"Subtitles\{name}");
                     break;
                 case FilesType.BookImage:
                     if (File.Exists($@"BookImages\{name}"))
