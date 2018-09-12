@@ -11,7 +11,7 @@ namespace Server.Service
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Surname, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups }
+    public enum PropertyData { Name, Surname, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Video, Videos }
     //Types of files to be uploaded or downloaded.
     public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book, Subtitles }
 
@@ -69,14 +69,15 @@ namespace Server.Service
             {
                 case ServerData.VideoCategory:
                     _context.VideoCategories.Add(new VideoCategory { Name = name });
+                    _context.SaveChanges();
                     return _context.VideoCategories.Where(b => b.Name == name).FirstOrDefault()?.Id;
 
                 case ServerData.BookCategory:
                     _context.BookCategories.Add(new BookCategory { Name = name });
+                    _context.SaveChanges();
                     return _context.BookCategories.Where(b => b.Name == name).FirstOrDefault()?.Id;
             }
-
-            _context.SaveChanges();
+            
             return null;
         }
 

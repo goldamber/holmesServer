@@ -204,6 +204,22 @@ namespace Server.Service
             return null;
         }
 
+        public int GetLastId(ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    return _context.Videos.Select(v => v.Id).Max() + 1;
+                case ServerData.Book:
+                    return _context.Books.Select(v => v.Id).Max() + 1;
+                case ServerData.User:
+                    return _context.Users.Select(v => v.Id).Max() + 1;
+                case ServerData.Word:
+                    return _context.Dictionary.Select(v => v.Id).Max() + 1;
+                default:
+                    return -1;
+            }
+        }
         public int? GetUserId(string login)
         {
             return _context.Users.Where(u => u.Username == login).FirstOrDefault()?.Id;

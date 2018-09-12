@@ -148,6 +148,13 @@ namespace Server.Service
         /// <returns>The quantity of marking stars.</returns>
         [OperationContract]
         int? GetMark(int itemId, int userId, ServerData data);
+        /// <summary>
+        /// Returns the last tabels id.
+        /// </summary>
+        /// <param name="data">Items type.</param>
+        /// <returns>Future id of an item to be addded.</returns>
+        [OperationContract]
+        int GetLastId(ServerData data);
 
         /// <summary>
         /// Gets a list of all items.
