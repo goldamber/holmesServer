@@ -9,11 +9,11 @@ using System.Linq;
 namespace Server.Service
 {
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
-    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, Group }
+    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group }
     //Describes the properties, that have to be sent to the client.
     public enum PropertyData { Name, Surname, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Video, Videos }
     //Types of files to be uploaded or downloaded.
-    public enum FilesType { Video, Avatar, BookImage, WordImage, VideoImage, Book, Subtitles }
+    public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
 
     public partial class EngService : IEngService
     {
@@ -109,6 +109,13 @@ namespace Server.Service
                     book.Categories.Add(bookCategory);
                     break;
             }
+            _context.SaveChanges();
+        }
+        public void AddBookmark(int pos, int item, int user)
+        {
+            if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Books.Where(b => b.Id == item).FirstOrDefault() == null)
+                return;
+            _context.Bookmarks.Add(new Bookmark { Position = pos, BookID = item, UserID = user });
             _context.SaveChanges();
         }
         #endregion
@@ -311,83 +318,18 @@ namespace Server.Service
         #region Upload/Download.
         public byte[] Download(string name, FilesType type)
         {
-            switch (type)
-            {
-                case FilesType.Video:
-                    if (File.Exists($@"Videos\{name}"))
-                        return File.ReadAllBytes($@"Videos\{name}");
-                    return null;
-                case FilesType.Subtitles:
-                    if (File.Exists($@"Subtitles\{name}"))
-                        return File.ReadAllBytes($@"Subtitles\{name}");
-                    return null;
-                case FilesType.BookImage:
-                    if (File.Exists($@"BookImages\{name}"))
-                        return File.ReadAllBytes($@"BookImages\{name}");
-                    return null;
-                case FilesType.WordImage:
-                    if (File.Exists($@"WordImages\{name}"))
-                        return File.ReadAllBytes($@"WordImages\{name}");
-                    return null;
-                case FilesType.VideoImage:
-                    if (File.Exists($@"VideoImages\{name}"))
-                        return File.ReadAllBytes($@"VideoImages\{name}");
-                    return null;
-                case FilesType.Avatar:
-                    if (File.Exists($@"Avatars\{name}"))
-                        return File.ReadAllBytes($@"Avatars\{name}");
-                    return null;
-                case FilesType.Book:
-                    if (File.Exists($@"Books\{name}"))
-                        return File.ReadAllBytes($@"Books\{name}");
-                    return null;
-                default:
-                    return null;
-            }
+            if (File.Exists($@"{type.ToString()}\{name}"))
+                return File.ReadAllBytes($@"{type.ToString()}\{name}");
+            return null;
         }
         public bool Upload(byte[] file, string name, FilesType type)
         {
             try
             {
                 string fileName = "";
-                switch (type)
-                {
-                    case FilesType.Video:
-                        if (!Directory.Exists("Videos"))
-                            Directory.CreateDirectory("Videos");
-                        fileName = $@"Videos\{name}";
-                        break;
-                    case FilesType.Subtitles:
-                        if (!Directory.Exists("Subtitles"))
-                            Directory.CreateDirectory("Subtitles");
-                        fileName = $@"Subtitles\{name}";
-                        break;
-                    case FilesType.BookImage:
-                        if (!Directory.Exists("BookImages"))
-                            Directory.CreateDirectory("BookImages");
-                        fileName = $@"BookImages\{name}";
-                        break;
-                    case FilesType.VideoImage:
-                        if (!Directory.Exists("VideoImages"))
-                            Directory.CreateDirectory("VideoImages");
-                        fileName = $@"VideoImages\{name}";
-                        break;
-                    case FilesType.Avatar:
-                        if (!Directory.Exists("Avatars"))
-                            Directory.CreateDirectory("Avatars");
-                        fileName = $@"Avatars\{name}";
-                        break;
-                    case FilesType.WordImage:
-                        if (!Directory.Exists("WordImages"))
-                            Directory.CreateDirectory("WordImages");
-                        fileName = $@"WordImages\{name}";
-                        break;
-                    case FilesType.Book:
-                        if (!Directory.Exists("Books"))
-                            Directory.CreateDirectory("Books");
-                        fileName = $@"Books\{name}";
-                        break;
-                }
+                if (!Directory.Exists(type.ToString()))
+                    Directory.CreateDirectory(type.ToString());
+                fileName = $@"{type.ToString()}\{name}";
 
                 using (FileStream fs = File.Create(fileName))
                 {
@@ -404,37 +346,8 @@ namespace Server.Service
         }
         public void Delete(string name, FilesType type)
         {
-            switch (type)
-            {
-                case FilesType.Video:
-                    if (File.Exists($@"Videos\{name}"))
-                        File.Delete($@"Videos\{name}");
-                    break;
-                case FilesType.Subtitles:
-                    if (File.Exists($@"Subtitles\{name}"))
-                        File.Delete($@"Subtitles\{name}");
-                    break;
-                case FilesType.BookImage:
-                    if (File.Exists($@"BookImages\{name}"))
-                        File.Delete($@"BookImages\{name}");
-                    break;
-                case FilesType.WordImage:
-                    if (File.Exists($@"WordImages\{name}"))
-                        File.Delete($@"WordImages\{name}");
-                    break;
-                case FilesType.VideoImage:
-                    if (File.Exists($@"VideoImages\{name}"))
-                        File.Delete($@"VideoImages\{name}");
-                    break;
-                case FilesType.Avatar:
-                    if (File.Exists($@"Avatars\{name}"))
-                        File.Delete($@"Avatars\{name}");
-                    break;
-                case FilesType.Book:
-                    if (File.Exists($@"Books\{name}"))
-                        File.Delete($@"Books\{name}");
-                    break;
-            }
+            if (File.Exists($@"{type.ToString()}\{name}"))
+                File.Delete($@"{type.ToString()}\{name}");
         }
         #endregion
     }

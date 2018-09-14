@@ -64,6 +64,14 @@ namespace Server.Service
         /// <returns>Returns the Id of an added 'Author', if the operation succeeded.</returns>
         [OperationContract]
         int? AddCategory(string name, ServerData data);
+        /// <summary>
+        /// Inserts a new bookmark.
+        /// </summary>
+        /// <param name="pos">Position.</param>
+        /// <param name="item">Books id.</param>
+        /// <param name="user">Users id.</param>
+        [OperationContract]
+        void AddBookmark(int pos, int item, int user);
 
         /// <summary>
         /// Adds a category to the books or videos.
@@ -207,6 +215,15 @@ namespace Server.Service
         /// <returns>If given user exists, then returns users id. Unless - NULL.</returns>
         [OperationContract]
         int? GetUserId(string login);
+        /// <summary>
+        /// Returns bookmark if exists.
+        /// </summary>
+        /// <param name="item">Items id.</param>
+        /// <param name="user">Users id.</param>
+        /// <param name="data">Items type.</param>
+        /// <returns>Bookmarks position.</returns>
+        [OperationContract]
+        int? GetLastMark(int item, int user, ServerData data);
         #endregion
         #region Check data.
         /// <summary>

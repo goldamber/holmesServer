@@ -222,7 +222,11 @@ namespace Server.Service
                         case PropertyData.Date:
                             return desc ? _context.Videos.OrderByDescending(v => v.Created).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Created).Select(v => v.Id).ToList();
                         case PropertyData.Year:
-                            return desc ? _context.Videos.OrderByDescending(v => v.Year).Select(v => v.Id).ToList() : _context.Videos.OrderBy(v => v.Year).Select(v => v.Id).ToList();
+                            List<Video> tmp = new List<Video>(_context.Videos.Where(b => b.Year != null));
+                            tmp = desc ? tmp.OrderByDescending(b => b.Year).ToList() : tmp.OrderBy(b => b.Year).ToList();
+                            List<int> lst = new List<int>(tmp.Select(b => b.Id));
+                            lst.AddRange(_context.Videos.Where(b => b.Year == null).Select(b => b.Id));
+                            return lst;
                     }
                     break;
                 case ServerData.Book:
@@ -234,7 +238,11 @@ namespace Server.Service
                         case PropertyData.Date:
                             return desc ? _context.Books.OrderByDescending(v => v.Created).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Created).Select(v => v.Id).ToList();
                         case PropertyData.Year:
-                            return desc ? _context.Books.OrderByDescending(v => v.Year).Select(v => v.Id).ToList() : _context.Books.OrderBy(v => v.Year).Select(v => v.Id).ToList();
+                            List<Book> tmp = new List<Book>(_context.Books.Where(b => b.Year != null));
+                            tmp = desc ? tmp.OrderByDescending(b => b.Year).ToList() : tmp.OrderBy(b => b.Year).ToList();
+                            List<int> lst = new List<int>(tmp.Select(b => b.Id));
+                            lst.AddRange(_context.Books.Where(b => b.Year == null).Select(b => b.Id));
+                            return lst;
                     }
                     break;
                 case ServerData.Author:

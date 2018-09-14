@@ -199,6 +199,26 @@ namespace Server.Service
                             return example.Name;
                     }
                     break;
+                case ServerData.VideoBookmark:
+                    VideoBookmark videoBookmark = _context.VideoBookmarks.Where(u => u.Id == id).FirstOrDefault();
+                    if (videoBookmark == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.Position:
+                            return videoBookmark.Position.ToString();
+                    }
+                    break;
+                case ServerData.Bookmark:
+                    Bookmark bookmark = _context.Bookmarks.Where(u => u.Id == id).FirstOrDefault();
+                    if (bookmark == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.Position:
+                            return bookmark.Position.ToString();
+                    }
+                    break;
             }
 
             return null;
@@ -236,6 +256,18 @@ namespace Server.Service
                     return null;
             }
         }
+        public int? GetLastMark(int item, int user, ServerData data)
+        {
+            switch (data)
+            {
+                case ServerData.Video:
+                    return _context.VideoBookmarks.Where(vb => vb.UserID == user && vb.VideoID == item).FirstOrDefault()?.Id;
+                case ServerData.Book:
+                    return _context.Bookmarks.Where(bm => bm.UserID == user && bm.BookID == item).FirstOrDefault()?.Id;
+                default:
+                    return null;
+            }
+        }
         #endregion
         #region Check.
         public bool? CheckAbsolute(int id, ServerData data)
@@ -246,14 +278,12 @@ namespace Server.Service
                     Video tmp = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
                     if (tmp == null)
                         return null;
-
                     return tmp.IsAbsolute;
 
                 case ServerData.Book:
                     Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
                     if (book == null)
                         return null;
-
                     return book.IsAbsolute;
             }
 
