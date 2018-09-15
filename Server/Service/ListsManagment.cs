@@ -278,7 +278,7 @@ namespace Server.Service
                             return desc ? _context.Users.OrderByDescending(v => v.Level).Select(v => v.Id).ToList() : _context.Users.OrderBy(v => v.Level).Select(v => v.Id).ToList();
                         case PropertyData.Role:
                             List<Role> roles = new List<Role>(_context.Roles);
-                            roles = desc ? roles.OrderBy(r => r).ToList() : roles.OrderByDescending(r => r).ToList();
+                            roles = desc ? roles.OrderBy(r => r.Name).ToList() : roles.OrderByDescending(r => r.Name).ToList();
                             List<int> users = new List<int>();
                             foreach (Role item in roles)
                             {

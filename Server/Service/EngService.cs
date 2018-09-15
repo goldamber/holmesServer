@@ -115,7 +115,10 @@ namespace Server.Service
         {
             if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Books.Where(b => b.Id == item).FirstOrDefault() == null)
                 return;
-            _context.Bookmarks.Add(new Bookmark { Position = pos, BookID = item, UserID = user });
+            if (_context.Bookmarks.Where(bm => bm.BookID == item && bm.UserID == user).FirstOrDefault() != null)
+                _context.Bookmarks.Where(bm => bm.BookID == item && bm.UserID == user).FirstOrDefault().Position = pos;
+            else
+                _context.Bookmarks.Add(new Bookmark { Position = pos, BookID = item, UserID = user });
             _context.SaveChanges();
         }
         #endregion
