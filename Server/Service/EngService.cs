@@ -11,7 +11,7 @@ namespace Server.Service
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Surname, Login, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Video, Videos }
+    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Video, Videos, Example, Examples }
     //Types of files to be uploaded or downloaded.
     public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
 
@@ -297,21 +297,38 @@ namespace Server.Service
             switch (data)
             {
                 case ServerData.Video:
-                    if (_context.Videos.Where(u => u.Id == item).FirstOrDefault() == null)
-                        return;
-                    _context.Videos.Where(u => u.Id == item).FirstOrDefault().Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                    _context.Videos.Where(u => u.Id == item).FirstOrDefault()?.Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
                     break;
 
                 case ServerData.Book:
-                    if (_context.Books.Where(u => u.Id == item).FirstOrDefault() == null)
-                        return;
-                    _context.Books.Where(u => u.Id == item).FirstOrDefault().Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                    _context.Books.Where(u => u.Id == item).FirstOrDefault()?.Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
                     break;
 
                 case ServerData.User:
-                    if (_context.Users.Where(u => u.Id == item).FirstOrDefault() == null)
-                        return;
-                    _context.Users.Where(u => u.Id == item).FirstOrDefault().Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                    bool removeAll = true;
+                    _context.Users.Where(u => u.Id == item).FirstOrDefault()?.Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                    _context.SaveChanges();
+                    foreach (User user in _context.Users.ToList())
+                    {
+                        if (user.Words.Select(w => w.Id).ToList().Contains(word))
+                        {
+                            removeAll = false;
+                            break;
+                        }
+                    }
+                    if (removeAll)
+                    {
+                        foreach (Book book in _context.Books.ToList())
+                        {
+                            if (book.Words.Select(w => w.Id).ToList().Contains(word))
+                                book.Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                        }
+                        foreach (Video video in _context.Videos.ToList())
+                        {
+                            if (video.Words.Select(w => w.Id).ToList().Contains(word))
+                                video.Words.Remove(_context.Dictionary.Where(u => u.Id == word).FirstOrDefault());
+                        }
+                    }
                     break;
             }
             _context.SaveChanges();

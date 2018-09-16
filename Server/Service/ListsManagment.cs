@@ -65,7 +65,7 @@ namespace Server.Service
                             List<int> vc = new List<int>();
                             foreach (VideoCategory item in _context.VideoCategories.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                foreach (Video val in _context.Videos)
+                                foreach (Video val in _context.Videos.ToList())
                                 {
                                     if (val.Categories.Contains(item) && !vc.Contains(val.Id))
                                         vc.Add(val.Id);
@@ -99,7 +99,7 @@ namespace Server.Service
                             List<int> bc = new List<int>();
                             foreach (BookCategory item in _context.BookCategories.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                foreach (Book val in _context.Books)
+                                foreach (Book val in _context.Books.ToList())
                                 {
                                     if (val.Categories.Contains(item) && !bc.Contains(val.Id))
                                         bc.Add(val.Id);
@@ -114,7 +114,7 @@ namespace Server.Service
                             List<int> book = new List<int>();
                             foreach (Author item in _context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter) || (c.Name.ToLower() + " " + c.Surname.ToLower()).Equals(filter) || (c.Surname.ToLower() + " " + c.Name.ToLower()).Equals(filter)).ToList())
                             {
-                                foreach (Book val in _context.Books)
+                                foreach (Book val in _context.Books.ToList())
                                 {
                                     if (val.Authors.Contains(item) && !book.Contains(val.Id))
                                         book.Add(val.Id);
@@ -150,7 +150,7 @@ namespace Server.Service
                             List<int> videoCat = new List<int>();
                             foreach (Video item in _context.Videos.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                foreach (VideoCategory val in _context.VideoCategories)
+                                foreach (VideoCategory val in _context.VideoCategories.ToList())
                                 {
                                     if (val.Videos.Contains(item) && !videoCat.Contains(val.Id))
                                         videoCat.Add(val.Id);
@@ -171,7 +171,7 @@ namespace Server.Service
                             List<int> bookCat = new List<int>();
                             foreach (Book item in _context.Books.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                foreach (BookCategory val in _context.BookCategories)
+                                foreach (BookCategory val in _context.BookCategories.ToList())
                                 {
                                     if (val.Books.Contains(item) && !bookCat.Contains(val.Id))
                                         bookCat.Add(val.Id);
@@ -189,18 +189,16 @@ namespace Server.Service
                             return _context.Authors.Where(v => v.Surname.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Book:
                         case PropertyData.Books:
-                            if (_context.Books.Where(v => v.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
-                                return null;
-                            List<int> auth = new List<int>();
+                            List<int> result = new List<int>();
                             foreach (Book item in _context.Books.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                foreach (Author val in _context.Authors)
+                                foreach (Author val in item.Authors)
                                 {
-                                    if (val.Books.Contains(item) && !auth.Contains(val.Id))
-                                        auth.Add(val.Id);
+                                    if (!result.Contains(val.Id))
+                                        result.Add(val.Id);
                                 }
                             }
-                            return auth.Count == 0? null: auth;
+                            return result.Count == 0 ? null : result;
                     }
                     break;
                 case ServerData.Game:
@@ -305,21 +303,21 @@ namespace Server.Service
 
         public IEnumerable<int> GetUserItemWords(int user, int item, ServerData data)
         {
+            List<int> res = new List<int>();
             switch (data)
             {
                 case ServerData.Video:
                     if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Videos.Where(u => u.Id == item).FirstOrDefault() == null)
                         return null;
-                    return _context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Videos.Contains(_context.Videos.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList();
-
+                    res = _context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Videos.Contains(_context.Videos.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList();
+                    break;
                 case ServerData.Book:
                     if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Books.Where(u => u.Id == item).FirstOrDefault() == null)
                         return null;
-                    return _context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Books.Contains(_context.Books.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList();
-
-                default:
-                    return null;
+                    res = _context.Dictionary.Where(w => w.Users.Contains(_context.Users.Where(u => u.Id == user).FirstOrDefault()) && w.Books.Contains(_context.Books.Where(u => u.Id == item).FirstOrDefault())).Select(w => w.Id).ToList();
+                    break;
             }
+            return res.Count == 0 ? null : res;
         }
         public IEnumerable<int> GetItemData(int id, ServerData data, ServerData res)
         {
@@ -334,7 +332,7 @@ namespace Server.Service
                         case ServerData.VideoCategory:
                             return video.Categories.Select(c => c.Id);
                         case ServerData.Word:
-                            return video.Words.Select(c => c.Id);
+                            return video.Words.Count == 0 ? null : video.Words.Select(w => w.Id);
                     }
                     break;
 
@@ -349,7 +347,7 @@ namespace Server.Service
                         case ServerData.BookCategory:
                             return book.Categories.Select(c => c.Id);
                         case ServerData.Word:
-                            return book.Words.Select(c => c.Id);
+                            return book.Words.Count == 0? null: book.Words.Select(w => w.Id);
                     }
                     break;
 

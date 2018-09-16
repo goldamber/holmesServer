@@ -119,6 +119,12 @@ namespace Server.Service
                             return word.Name;
                         case PropertyData.Imgpath:
                             return word.ImgPath;
+                        case PropertyData.PluralForm:
+                            return _context.WordForms.Where(f => f.Id == word.FormID).FirstOrDefault()?.PluralForm;
+                        case PropertyData.PastForm:
+                            return _context.WordForms.Where(f => f.Id == word.FormID).FirstOrDefault()?.PastForm;
+                        case PropertyData.PastThForm:
+                            return _context.WordForms.Where(f => f.Id == word.FormID).FirstOrDefault()?.PastThForm;
                     }
                     break;
                 case ServerData.WordForm:
@@ -143,6 +149,8 @@ namespace Server.Service
                     {
                         case PropertyData.Name:
                             return wordCategory.Name;
+                        case PropertyData.Abbreviation:
+                            return wordCategory.Abbreviation;
                     }
                     break;
                 case ServerData.Translation:
@@ -223,7 +231,6 @@ namespace Server.Service
 
             return null;
         }
-
         public int GetLastId(ServerData data)
         {
             switch (data)
