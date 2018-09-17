@@ -18,10 +18,10 @@ namespace Server.Entities
         [DataMember]
         public int VideoID { get; set; }
         [DataMember]
-        public Video VideoName { get; set; }
+        public virtual Video VideoName { get; set; }
         [DataMember]
         public int UserID { get; set; }
         [DataMember]
-        public User UserName { get; set; }
+        public virtual User UserName { get; set; }
     }
 }

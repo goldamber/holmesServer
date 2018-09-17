@@ -18,11 +18,11 @@ namespace Server.Entities
         [DataMember]
         public int UserID { get; set; }
         [DataMember]
-        public User Users { get; set; }
+        public virtual User Users { get; set; }
 
         [DataMember]
         public int VideoID { get; set; }
         [DataMember]
-        public Video Videos { get; set; }
+        public virtual Video Videos { get; set; }
     }
 }

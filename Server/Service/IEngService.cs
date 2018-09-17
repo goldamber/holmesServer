@@ -59,11 +59,19 @@ namespace Server.Service
         /// <summary>
         /// Inserts a new 'Category' item.
         /// </summary>
-        /// <param name="name">The name of a category</param>
+        /// <param name="name">The name of a category.</param>
         /// <param name="data">Describes the type of an item ('VideoCategory' OR 'BideoCategory').</param>
         /// <returns>Returns the Id of an added 'Author', if the operation succeeded.</returns>
         [OperationContract]
         int? AddCategory(string name, ServerData data);
+        /// <summary>
+        /// Inserts a new 'WordCategory' item.
+        /// </summary>
+        /// <param name="name">The name of a category.</param>
+        /// <param name="abbr">Abbreviation.</param>
+        /// <returns>Returns the Id of an added 'Author', if the operation succeeded.</returns>
+        [OperationContract]
+        int? AddWordsCategory(string name, string abbr);
         /// <summary>
         /// Inserts a new bookmark.
         /// </summary>

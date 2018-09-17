@@ -9,9 +9,9 @@ using System.Linq;
 namespace Server.Service
 {
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
-    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group }
+    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group, Transcription }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Video, Videos, Example, Examples }
+    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Word, Words, Video, Videos, Example, Examples, Transcription, British, American, Australian, Canadian }
     //Types of files to be uploaded or downloaded.
     public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
 
@@ -71,16 +71,23 @@ namespace Server.Service
                     _context.VideoCategories.Add(new VideoCategory { Name = name });
                     _context.SaveChanges();
                     return _context.VideoCategories.Where(b => b.Name == name).FirstOrDefault()?.Id;
-
                 case ServerData.BookCategory:
                     _context.BookCategories.Add(new BookCategory { Name = name });
                     _context.SaveChanges();
                     return _context.BookCategories.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Group:
+                    _context.Groups.Add(new WordsGroup { Name = name });
+                    _context.SaveChanges();
+                    return _context.Groups.Where(b => b.Name == name).FirstOrDefault()?.Id;
             }
-            
             return null;
         }
-
+        public int? AddWordsCategory(string name, string abbr)
+        {
+            _context.WordCategories.Add(new WordCategory { Name = name, Abbreviation = abbr });
+            _context.SaveChanges();
+            return _context.WordCategories.Where(b => b.Name == name).FirstOrDefault()?.Id;
+        }
         public void AddBookAuthor(int bookId, int author)
         {
             Book book = _context.Books.Where(u => u.Id == bookId).FirstOrDefault();
@@ -211,6 +218,31 @@ namespace Server.Service
                             break;
                     }
                     break;
+                case ServerData.WordCategory:
+                    WordCategory wc = _context.WordCategories.Where(u => u.Id == id).FirstOrDefault();
+                    if (wc == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            wc.Name = changes;
+                            break;
+                        case PropertyData.Abbreviation:
+                            wc.Abbreviation = changes;
+                            break;
+                    }
+                    break;
+                case ServerData.Group:
+                    WordsGroup wg = _context.Groups.Where(u => u.Id == id).FirstOrDefault();
+                    if (wg == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            wg.Name = changes;
+                            break;
+                    }
+                    break;
             }
             _context.SaveChanges();
         }
@@ -249,6 +281,10 @@ namespace Server.Service
                     if (_context.Books.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Books.Remove(_context.Books.Where(b => b.Id == id).FirstOrDefault());
                     break;
+                case ServerData.Word:
+                    if (_context.Dictionary.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Dictionary.Remove(_context.Dictionary.Where(b => b.Id == id).FirstOrDefault());
+                    break;
                 case ServerData.Author:
                     if (_context.Authors.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Authors.Remove(_context.Authors.Where(b => b.Id == id).FirstOrDefault());
@@ -265,9 +301,13 @@ namespace Server.Service
                     if (_context.BookCategories.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.BookCategories.Remove(_context.BookCategories.Where(b => b.Id == id).FirstOrDefault());
                     break;
-                case ServerData.Word:
-                    if (_context.Dictionary.Where(b => b.Id == id).FirstOrDefault() != null)
-                        _context.Dictionary.Remove(_context.Dictionary.Where(b => b.Id == id).FirstOrDefault());
+                case ServerData.WordCategory:
+                    if (_context.WordCategories.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.WordCategories.Remove(_context.WordCategories.Where(b => b.Id == id).FirstOrDefault());
+                    break;
+                case ServerData.Group:
+                    if (_context.Groups.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Groups.Remove(_context.Groups.Where(b => b.Id == id).FirstOrDefault());
                     break;
             }
             

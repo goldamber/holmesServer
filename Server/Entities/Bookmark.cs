@@ -17,11 +17,11 @@ namespace Server.Entities
         [DataMember]
         public int UserID { get; set; }
         [DataMember]
-        public User Users { get; set; }
+        public virtual User Users { get; set; }
 
         [DataMember]
         public int BookID { get; set; }
         [DataMember]
-        public Book Books { get; set; }
+        public virtual Book Books { get; set; }
     }
 }

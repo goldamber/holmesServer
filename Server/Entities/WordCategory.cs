@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Server.Entities
@@ -10,13 +11,13 @@ namespace Server.Entities
     /// </summary>
     public class WordCategory : EntityTable
     {
-        [DataMember]
+        [DataMember, Required]
         public string Name { get; set; }
         [DataMember]
         public string Abbreviation { get; set; }
 
         [DataMember]
-        public List<Word> Words { get; set; }
+        public virtual List<Word> Words { get; set; }
 
         public WordCategory()
         {

@@ -27,6 +27,8 @@ namespace Server.Service
                     return _context.Dictionary.Select(f => f.Id).ToList();
                 case ServerData.WordCategory:
                     return _context.WordCategories.Select(f => f.Id).ToList();
+                case ServerData.Group:
+                    return _context.Groups.Select(f => f.Id).ToList();
                 case ServerData.Author:
                     return _context.Authors.Select(f => f.Id).ToList();
                 case ServerData.Game:
@@ -138,6 +140,104 @@ namespace Server.Service
                             return _context.Users.Where(v => v.RoleID == _context.Roles.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault().Id).Select(f => f.Id).ToList();
                     }
                     break;
+                case ServerData.Word:
+                    switch (fil)
+                    {
+                        case PropertyData.Name:
+                            return _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Category:
+                        case PropertyData.Categories:
+                            if (_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
+                                return null;
+                            List<int> wc = new List<int>();
+                            foreach (WordCategory item in _context.WordCategories.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                System.Console.WriteLine(item.Words.Count);
+                                foreach (Word val in item.Words)
+                                {
+                                    if (!wc.Contains(val.Id))
+                                        wc.Add(val.Id);
+                                }
+                            }
+                            return wc.Count == 0 ? null : wc;
+                        case PropertyData.Group:
+                        case PropertyData.Groups:
+                            if (_context.Groups.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
+                                return null;
+                            List<int> wg = new List<int>();
+                            foreach (WordsGroup item in _context.Groups.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (Word val in item.Words)
+                                {
+                                    if (!wg.Contains(val.Id))
+                                        wg.Add(val.Id);
+                                }
+                            }
+                            return wg.Count == 0 ? null : wg;
+                        case PropertyData.Synonyms:
+                            if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null && _context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault() == null)
+                                return null;
+                            List<int> words = new List<int>();
+                            foreach (Translation item in _context.Translations.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (Word val in _context.Dictionary.ToList())
+                                {
+                                    if (val.Translations.Contains(item) && !words.Contains(val.Id))
+                                        words.Add(val.Id);
+                                }
+                            }
+                            foreach (Definition item in _context.Definitions.Where(v => v.Name.ToLower() == filter).ToList())
+                            {
+                                foreach (Word val in _context.Dictionary.ToList())
+                                {
+                                    if (val.Descriptions.Contains(item) && !words.Contains(val.Id))
+                                        words.Add(val.Id);
+                                }
+                            }
+                            return words.Count == 0 ? null : words;
+
+                        case PropertyData.Translation:
+                        case PropertyData.Translations:
+                            if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)) == null)
+                                return null;
+                            List<int> trWords = new List<int>();
+                            foreach (Translation item in _context.Translations.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (Word val in item.Words)
+                                {
+                                    if (!trWords.Contains(val.Id))
+                                        trWords.Add(val.Id);
+                                }
+                            }
+                            return trWords.Count == 0 ? null : trWords;
+                        case PropertyData.Definition:
+                        case PropertyData.Description:
+                        case PropertyData.Definitions:
+                            if (_context.Definitions.Where(c => c.Name.ToLower().Contains(filter)) == null)
+                                return null;
+                            List<int> defWords = new List<int>();
+                            foreach (Definition item in _context.Definitions.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (Word val in _context.Dictionary.ToList())
+                                {
+                                    if (val.Descriptions.Contains(item) && !defWords.Contains(val.Id))
+                                        defWords.Add(val.Id);
+                                }
+                            }
+                            return defWords.Count == 0 ? null : defWords;
+                        case PropertyData.Example:
+                        case PropertyData.Examples:
+                            if (_context.Examples.Where(c => c.Name == filter) == null)
+                                return null;
+                            List<int> expWords = new List<int>();
+                            foreach (Example item in _context.Examples.Where(c => c.Name == filter).ToList())
+                            {
+                                if (!expWords.Contains(item.WordID))
+                                    expWords.Add(item.WordID);
+                            }
+                            return expWords.Count == 0 ? null : expWords;
+                    }
+                    break;
                 case ServerData.VideoCategory:
                     switch (fil)
                     {
@@ -178,6 +278,50 @@ namespace Server.Service
                                 }
                             }
                             return bookCat.Count == 0? null: bookCat;
+                    }
+                    break;
+                case ServerData.WordCategory:
+                    switch (fil)
+                    {
+                        case PropertyData.Name:
+                            return _context.WordCategories.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Abbreviation:
+                            return _context.WordCategories.Where(v => v.Abbreviation.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Word:
+                        case PropertyData.Words:
+                            if (_context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
+                                return null;
+                            List<int> wordCat = new List<int>();
+                            foreach (Word item in _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (WordCategory val in item.Categories.ToList())
+                                {
+                                    if (!wordCat.Contains(val.Id))
+                                        wordCat.Add(val.Id);
+                                }
+                            }
+                            return wordCat.Count == 0 ? null : wordCat;
+                    }
+                    break;
+                case ServerData.Group:
+                    switch (fil)
+                    {
+                        case PropertyData.Name:
+                            return _context.Groups.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                        case PropertyData.Word:
+                        case PropertyData.Words:
+                            if (_context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
+                                return null;
+                            List<int> wordCat = new List<int>();
+                            foreach (Word item in _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            {
+                                foreach (WordsGroup val in item.Groups.ToList())
+                                {
+                                    if (!wordCat.Contains(val.Id))
+                                        wordCat.Add(val.Id);
+                                }
+                            }
+                            return wordCat.Count == 0 ? null : wordCat;
                     }
                     break;
                 case ServerData.Author:
@@ -266,6 +410,22 @@ namespace Server.Service
                             return desc ? _context.VideoCategories.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.VideoCategories.OrderBy(v => v.Name).Select(v => v.Id).ToList();
                     }
                     break;
+                case ServerData.WordCategory:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.WordCategories.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.WordCategories.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                        case PropertyData.Abbreviation:
+                            return desc ? _context.WordCategories.OrderByDescending(v => v.Abbreviation).Select(v => v.Id).ToList() : _context.WordCategories.OrderBy(v => v.Abbreviation).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.Group:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Groups.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Groups.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                    }
+                    break;
                 case ServerData.User:
                     switch (property)
                     {
@@ -300,7 +460,6 @@ namespace Server.Service
 
             return null;
         }
-
         public IEnumerable<int> GetUserItemWords(int user, int item, ServerData data)
         {
             List<int> res = new List<int>();
@@ -401,6 +560,26 @@ namespace Server.Service
                     {
                         case ServerData.Book:
                             return vc.Videos.Select(c => c.Id);
+                    }
+                    break;
+                case ServerData.WordCategory:
+                    WordCategory wc = _context.WordCategories.Where(u => u.Id == id).FirstOrDefault();
+                    if (wc == null)
+                        return null;
+                    switch (res)
+                    {
+                        case ServerData.Word:
+                            return wc.Words.Select(c => c.Id);
+                    }
+                    break;
+                case ServerData.Group:
+                    WordsGroup wg = _context.Groups.Where(u => u.Id == id).FirstOrDefault();
+                    if (wg == null)
+                        return null;
+                    switch (res)
+                    {
+                        case ServerData.Word:
+                            return wg.Words.Select(c => c.Id);
                     }
                     break;
             }

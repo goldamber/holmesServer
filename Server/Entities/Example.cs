@@ -16,6 +16,6 @@ namespace Server.Entities
         [DataMember]
         public int WordID { get; set; }
         [DataMember]
-        public Word Words { get; set; }
+        public virtual Word Words { get; set; }
     }
 }

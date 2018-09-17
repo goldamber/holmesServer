@@ -125,6 +125,8 @@ namespace Server.Service
                             return _context.WordForms.Where(f => f.Id == word.FormID).FirstOrDefault()?.PastForm;
                         case PropertyData.PastThForm:
                             return _context.WordForms.Where(f => f.Id == word.FormID).FirstOrDefault()?.PastThForm;
+                        case PropertyData.Transcription:
+                            return word.TranscriptionID == null? null: word.TranscriptionID.ToString();
                     }
                     break;
                 case ServerData.WordForm:
@@ -141,6 +143,16 @@ namespace Server.Service
                             return wordForm.PluralForm;
                     }
                     break;
+                case ServerData.Group:
+                    WordsGroup group = _context.Groups.Where(u => u.Id == id).FirstOrDefault();
+                    if (group == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return group.Name;
+                    }
+                    break;
                 case ServerData.WordCategory:
                     WordCategory wordCategory = _context.WordCategories.Where(u => u.Id == id).FirstOrDefault();
                     if (wordCategory == null)
@@ -151,6 +163,22 @@ namespace Server.Service
                             return wordCategory.Name;
                         case PropertyData.Abbreviation:
                             return wordCategory.Abbreviation;
+                    }
+                    break;
+                case ServerData.Transcription:
+                    Transcription transcription = _context.Transcriptions.Where(u => u.Id == id).FirstOrDefault();
+                    if (transcription == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.British:
+                            return transcription.British;
+                        case PropertyData.Canadian:
+                            return transcription.Canadian;
+                        case PropertyData.Australian:
+                            return transcription.Australian;
+                        case PropertyData.American:
+                            return transcription.American;
                     }
                     break;
                 case ServerData.Translation:
@@ -310,6 +338,10 @@ namespace Server.Service
                     return _context.VideoCategories.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.BookCategory:
                     return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.WordCategory:
+                    return _context.WordCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Group:
+                    return _context.Groups.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.Word:
                     return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
             }

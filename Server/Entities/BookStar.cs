@@ -18,10 +18,10 @@ namespace Server.Entities
         [DataMember]
         public int BookID { get; set; }
         [DataMember]
-        public Book BookName { get; set; }
+        public virtual Book BookName { get; set; }
         [DataMember]
         public int UserID { get; set; }
         [DataMember]
-        public User UserName { get; set; }
+        public virtual User UserName { get; set; }
     }
 }

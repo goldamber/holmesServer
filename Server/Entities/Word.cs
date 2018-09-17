@@ -29,14 +29,14 @@ namespace Server.Entities
         [DataMember]
         public int? FormID { get; set; }
         [DataMember]
-        public WordForm Form { get; set; }
+        public virtual WordForm Form { get; set; }
         [DataMember]
         public int? TranscriptionID { get; set; }
         [DataMember]
-        public Transcription Transcriptions { get; set; }
+        public virtual Transcription Transcriptions { get; set; }
 
         [DataMember]
-        public List<WordCategory> Categories { get; set; }
+        public virtual List<WordCategory> Categories { get; set; }
         [DataMember]
         public virtual List<Translation> Translations { get; set; }
         [DataMember]

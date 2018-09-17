@@ -27,7 +27,7 @@ namespace Server.Entities
         [DataMember]
         public int RoleID { get; set; }
         [DataMember]
-        public Role Roles { get; set; }
+        public virtual Role Roles { get; set; }
 
         [DataMember]
         public virtual List<Word> Words { get; set; }

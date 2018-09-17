@@ -18,10 +18,10 @@ namespace Server.Entities
         [DataMember]
         public int GameID { get; set; }
         [DataMember]
-        public Game GameName { get; set; }
+        public virtual Game GameName { get; set; }
         [DataMember]
         public int UserID { get; set; }
         [DataMember]
-        public User UserName { get; set; }
+        public virtual User UserName { get; set; }
     }
 }
