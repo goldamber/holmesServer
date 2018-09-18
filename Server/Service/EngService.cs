@@ -11,7 +11,7 @@ namespace Server.Service
     //Types of data, that can be used for the general actions (insert, remove, edit, view).
     public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group, Transcription }
     //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Word, Words, Video, Videos, Example, Examples, Transcription, British, American, Australian, Canadian }
+    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Homophones, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Word, Words, Video, Videos, Example, Examples, Transcription, British, American, Australian, Canadian }
     //Types of files to be uploaded or downloaded.
     public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
 
@@ -374,7 +374,6 @@ namespace Server.Service
             _context.SaveChanges();
         }
         #endregion
-
         #region Upload/Download.
         public byte[] Download(string name, FilesType type)
         {

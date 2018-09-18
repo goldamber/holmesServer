@@ -174,6 +174,11 @@ namespace Server.Service
                                 }
                             }
                             return wg.Count == 0 ? null : wg;
+                        case PropertyData.Homophones:
+                            Word word = _context.Dictionary.Where(w => w.Name.ToLower() == filter).FirstOrDefault();
+                            if (word == null || word.TranscriptionID == null)
+                                return null;
+                            return _context.Dictionary.Where(v => v.Transcriptions.British.ToLower() == word.Transcriptions.British.ToLower()).Select(f => f.Id).ToList();
                         case PropertyData.Synonyms:
                             if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null && _context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault() == null)
                                 return null;
