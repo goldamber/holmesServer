@@ -52,14 +52,6 @@ namespace Server.Service
                             return _context.Videos.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Year:
                             return _context.Videos.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
-                        case PropertyData.Mark:
-                            List<int> lst = new List<int>();
-                            foreach (int item in _context.VideoStars.Where(v => v.MarkCount.ToString().Equals(filter)).Select(v => v.VideoID))
-                            {
-                                if (!lst.Contains(item))
-                                    lst.Add(item);
-                            }
-                            return lst;
                         case PropertyData.Category:
                         case PropertyData.Categories:
                             if (_context.VideoCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
@@ -85,15 +77,6 @@ namespace Server.Service
                             return _context.Books.Where(v => v.Description.ToLower().Contains(filter)).Select(f => f.Id).ToList();
                         case PropertyData.Year:
                             return _context.Books.Where(v => v.Year.ToString().Equals(filter)).Select(f => f.Id).ToList();
-                        case PropertyData.Mark:
-                            List<int> lst = new List<int>();
-                            foreach (int item in _context.BookStars.Where(v => v.MarkCount.ToString().Equals(filter)).Select(v => v.BookID))
-                            {
-                                if (!lst.Contains(item))
-                                    lst.Add(item);
-                            }
-                            return lst;
-
                         case PropertyData.Category:
                         case PropertyData.Categories:
                             if (_context.BookCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
@@ -108,7 +91,6 @@ namespace Server.Service
                                 }
                             }
                             return bc.Count == 0? null : bc;
-
                         case PropertyData.Author:
                         case PropertyData.Authors:
                             if (_context.Authors.Where(c => c.Name.ToLower().Contains(filter) || c.Surname.ToLower().Contains(filter) || (c.Name.ToLower() + " " + c.Surname.ToLower()).Equals(filter) || (c.Surname.ToLower() + " " + c.Name.ToLower()).Equals(filter)).FirstOrDefault() == null)
@@ -152,7 +134,6 @@ namespace Server.Service
                             List<int> wc = new List<int>();
                             foreach (WordCategory item in _context.WordCategories.Where(v => v.Name.ToLower().Contains(filter)).ToList())
                             {
-                                System.Console.WriteLine(item.Words.Count);
                                 foreach (Word val in item.Words)
                                 {
                                     if (!wc.Contains(val.Id))
@@ -180,23 +161,37 @@ namespace Server.Service
                                 return null;
                             return _context.Dictionary.Where(v => v.Transcriptions.British.ToLower() == word.Transcriptions.British.ToLower()).Select(f => f.Id).ToList();
                         case PropertyData.Synonyms:
-                            if (_context.Translations.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null && _context.Definitions.Where(c => c.Name.ToLower() == filter).FirstOrDefault() == null)
+                            Word wordS = _context.Dictionary.Where(w => w.Name.ToLower() == filter).FirstOrDefault();
+                            if (wordS == null || (wordS.Translations == null && wordS.Descriptions == null))
                                 return null;
+
                             List<int> words = new List<int>();
-                            foreach (Translation item in _context.Translations.Where(v => v.Name.ToLower().Contains(filter)).ToList())
+                            if (wordS.Translations != null)
                             {
-                                foreach (Word val in _context.Dictionary.ToList())
+                                foreach (Translation item in _context.Translations.ToList())
                                 {
-                                    if (val.Translations.Contains(item) && !words.Contains(val.Id))
-                                        words.Add(val.Id);
+                                    if (wordS.Translations.Select(t => t.Name).ToList().Contains(item.Name))
+                                    {
+                                        foreach (Word val in item.Words.ToList())
+                                        {
+                                            if (!words.Contains(val.Id))
+                                                words.Add(val.Id);
+                                        }
+                                    }
                                 }
                             }
-                            foreach (Definition item in _context.Definitions.Where(v => v.Name.ToLower() == filter).ToList())
+                            if (wordS.Descriptions != null)
                             {
-                                foreach (Word val in _context.Dictionary.ToList())
+                                foreach (Definition item in _context.Definitions.ToList())
                                 {
-                                    if (val.Descriptions.Contains(item) && !words.Contains(val.Id))
-                                        words.Add(val.Id);
+                                    if (wordS.Descriptions.Select(t => t.Name).ToList().Contains(item.Name))
+                                    {
+                                        foreach (Word val in item.Words.ToList())
+                                        {
+                                            if (!words.Contains(val.Id))
+                                                words.Add(val.Id);
+                                        }
+                                    }
                                 }
                             }
                             return words.Count == 0 ? null : words;
@@ -563,7 +558,7 @@ namespace Server.Service
                         return null;
                     switch (res)
                     {
-                        case ServerData.Book:
+                        case ServerData.Video:
                             return vc.Videos.Select(c => c.Id);
                     }
                     break;

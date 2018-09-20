@@ -218,6 +218,17 @@ namespace Server.Service
                             break;
                     }
                     break;
+                case ServerData.VideoCategory:
+                    VideoCategory vc = _context.VideoCategories.Where(u => u.Id == id).FirstOrDefault();
+                    if (vc == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            vc.Name = changes;
+                            break;
+                    }
+                    break;
                 case ServerData.WordCategory:
                     WordCategory wc = _context.WordCategories.Where(u => u.Id == id).FirstOrDefault();
                     if (wc == null)
