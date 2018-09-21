@@ -1,4 +1,5 @@
 ﻿using Server.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -126,7 +127,7 @@ namespace Server.Service
                     switch (fil)
                     {
                         case PropertyData.Name:
-                            return _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                            return _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter) || (v.Form != null && v.Form.PluralForm.Equals(filter)) || (v.Form != null && v.Form.PastForm.Equals(filter)) || (v.Form != null && v.Form.PastThForm.Equals(filter))).Select(f => f.Id).ToList();
                         case PropertyData.Category:
                         case PropertyData.Categories:
                             if (_context.WordCategories.Where(c => c.Name.ToLower().Contains(filter)).FirstOrDefault() == null)
@@ -156,12 +157,12 @@ namespace Server.Service
                             }
                             return wg.Count == 0 ? null : wg;
                         case PropertyData.Homophones:
-                            Word word = _context.Dictionary.Where(w => w.Name.ToLower() == filter).FirstOrDefault();
+                            Word word = _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter) || (v.Form != null && v.Form.PluralForm.Equals(filter)) || (v.Form != null && v.Form.PastForm.Equals(filter)) || (v.Form != null && v.Form.PastThForm.Equals(filter))).FirstOrDefault();
                             if (word == null || word.TranscriptionID == null)
                                 return null;
                             return _context.Dictionary.Where(v => v.Transcriptions.British.ToLower() == word.Transcriptions.British.ToLower()).Select(f => f.Id).ToList();
                         case PropertyData.Synonyms:
-                            Word wordS = _context.Dictionary.Where(w => w.Name.ToLower() == filter).FirstOrDefault();
+                            Word wordS = _context.Dictionary.Where(v => v.Name.ToLower().Contains(filter) || (v.Form != null && v.Form.PluralForm.Equals(filter)) || (v.Form != null && v.Form.PastForm.Equals(filter)) || (v.Form != null && v.Form.PastThForm.Equals(filter))).FirstOrDefault();
                             if (wordS == null || (wordS.Translations == null && wordS.Descriptions == null))
                                 return null;
 
@@ -232,8 +233,8 @@ namespace Server.Service
                             List<int> expWords = new List<int>();
                             foreach (Example item in _context.Examples.Where(c => c.Name == filter).ToList())
                             {
-                                if (!expWords.Contains(item.WordID))
-                                    expWords.Add(item.WordID);
+                                if (!expWords.Contains(Convert.ToInt32(item.WordID)))
+                                    expWords.Add(Convert.ToInt32(item.WordID));
                             }
                             return expWords.Count == 0 ? null : expWords;
                     }

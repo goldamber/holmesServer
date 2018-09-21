@@ -259,25 +259,42 @@ namespace Server.Service
 
             return null;
         }
-        public int GetLastId(ServerData data)
+        public int? GetWord(string search)
         {
-            switch (data)
+            search = search.ToLower();
+            Word word = _context.Dictionary.Where(w => w.Name.ToLower().Equals(search) || w.Form.PluralForm.ToLower().Equals(search)
+                || w.Form.PastForm.ToLower().Equals(search) || w.Form.PastThForm.ToLower().Equals(search)
+                || (w.Name.ToLower() + "s").Equals(search) || (w.Name.ToLower() + "es").Equals(search)
+                || (w.Name.ToLower().EndsWith("ies") && (w.Name.ToLower().Substring(0, w.Name.Length - 3) + "y").Equals(search))
+                || (w.Name.ToLower().EndsWith("ing") && (w.Name.ToLower().Substring(0, w.Name.Length - 3).Equals(search)))).FirstOrDefault();
+            if (word == null)
             {
-                case ServerData.Video:
-                    return _context.Videos.Select(v => v.Id).Max() + 1;
-                case ServerData.Book:
-                    return _context.Books.Select(v => v.Id).Max() + 1;
-                case ServerData.User:
-                    return _context.Users.Select(v => v.Id).Max() + 1;
-                case ServerData.Word:
-                    return _context.Dictionary.Select(v => v.Id).Max() + 1;
-                default:
-                    return -1;
+                if (search == "has" || search == "having")
+                    word = _context.Dictionary.Where(w => w.Name == "have").FirstOrDefault();
+                if (search == "won't")
+                    word = _context.Dictionary.Where(w => w.Name == "will").FirstOrDefault();
             }
+            return word?.Id;
         }
-        public int? GetUserId(string login)
+        public int? GetItemsId(string name, ServerData type)
         {
-            return _context.Users.Where(u => u.Username == login).FirstOrDefault()?.Id;
+            switch (type)
+            {
+                case ServerData.User:
+                    return _context.Users.Where(u => u.Username == name).FirstOrDefault()?.Id;
+                case ServerData.Word:
+                    return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Translation:
+                    return _context.Translations.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Definition:
+                    return _context.Definitions.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Example:
+                    return _context.Examples.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Group:
+                    return _context.Groups.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                default:
+                    return null;
+            }
         }
         public int? GetMark(int itemId, int userId, ServerData data)
         {
@@ -340,6 +357,14 @@ namespace Server.Service
                     return _context.BookCategories.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.WordCategory:
                     return _context.WordCategories.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Transcription:
+                    return _context.Transcriptions.Where(u => u.British == name || u.American == name || u.Canadian == name || u.Australian == name).FirstOrDefault() != null;
+                case ServerData.Translation:
+                    return _context.Translations.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Definition:
+                    return _context.Definitions.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Example:
+                    return _context.Examples.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.Group:
                     return _context.Groups.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.Word:

@@ -1,6 +1,7 @@
 ﻿using Server.Database;
 using Server.Entities;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.IO;
@@ -30,7 +31,6 @@ namespace Server.Service
         {
             _context.Authors.Add(new Author { Name = name, Surname = surname });
             _context.SaveChanges();
-
             return _context.Authors.Where(a => a.Name == name && a.Surname == surname).FirstOrDefault()?.Id;
         }
         public int? AddBook(string name, string desc, string path, string img, bool absolute, int? mark, int? user, int? year, DateTime created)
@@ -40,7 +40,6 @@ namespace Server.Service
             if (mark != null)
                 _context.BookStars.Add(new BookStar { MarkCount = Convert.ToInt32(mark), BookID = _context.Books.Where(v => v.Name == name).FirstOrDefault().Id, UserID = Convert.ToInt32(user) });
             _context.SaveChanges();
-
             return _context.Books.Where(b => b.Name == name).FirstOrDefault()?.Id;
         }
         public int? AddUser(string login, string pswd, string avatar, string role, int level = 0)
@@ -50,7 +49,6 @@ namespace Server.Service
             val.Roles = tmp;
             _context.Users.Add(val);
             _context.SaveChanges();
-
             return _context.Users.Where(b => b.Username == login).FirstOrDefault()?.Id;
         }
         public int? AddVideo(string name, string desc, string path, string sub, string img, bool absolute, int? mark, int? user, int? year, DateTime created)
@@ -60,10 +58,20 @@ namespace Server.Service
             if (mark != null)
                 _context.VideoStars.Add(new VideoStar { MarkCount = Convert.ToInt32(mark), VideoID = _context.Videos.Where(v => v.Name == name).FirstOrDefault().Id, UserID = Convert.ToInt32(user) });
             _context.SaveChanges();
-
             return _context.Videos.Where(b => b.Name == name).FirstOrDefault()?.Id;
         }
-        public int? AddCategory(string name, ServerData data)
+        public int? AddWord(string name, string img, int user)
+        {
+            User tmp = _context.Users.Where(u => u.Id == user).FirstOrDefault();
+            if (tmp == null)
+                return null;
+            Word word = new Word { Name = name, ImgPath = img };
+            word.Users.Add(tmp);
+            _context.Dictionary.Add(word);
+            _context.SaveChanges();
+            return _context.Dictionary.Where(a => a.Name == name && a.ImgPath == img).FirstOrDefault()?.Id;
+        }
+        public int? AddData(string name, ServerData data)
         {
             switch (data)
             {
@@ -79,8 +87,42 @@ namespace Server.Service
                     _context.Groups.Add(new WordsGroup { Name = name });
                     _context.SaveChanges();
                     return _context.Groups.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Translation:
+                    _context.Translations.Add(new Translation { Name = name });
+                    _context.SaveChanges();
+                    return _context.Translations.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Definition:
+                    _context.Definitions.Add(new Definition { Name = name });
+                    _context.SaveChanges();
+                    return _context.Definitions.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Example:
+                    _context.Examples.Add(new Example { Name = name });
+                    _context.SaveChanges();
+                    return _context.Examples.Where(b => b.Name == name).FirstOrDefault()?.Id;
             }
             return null;
+        }
+        public int? AddWordsForm(int word, string past, string plural, string pastTh)
+        {
+            Word item = _context.Dictionary.Where(w => w.Id == word).FirstOrDefault();
+            if (item == null)
+                return null;
+            _context.WordForms.Add(new WordForm { PastForm = past, PastThForm = pastTh, PluralForm = plural });
+            _context.SaveChanges();
+            item.Form = _context.WordForms.Where(wf => wf.PastForm == past && wf.PastThForm == pastTh && wf.PluralForm == plural).FirstOrDefault();
+            _context.SaveChanges();
+            return item.FormID;
+        }
+        public int? AddWordsTranscription(int word, string british, string canadian, string american, string australian)
+        {
+            Word item = _context.Dictionary.Where(w => w.Id == word).FirstOrDefault();
+            if (item == null)
+                return null;
+            _context.Transcriptions.Add(new Transcription { British = british, Canadian = canadian, American = american, Australian = australian });
+            _context.SaveChanges();
+            item.Transcriptions = _context.Transcriptions.Where(wf => wf.British == british && wf.Canadian == canadian && wf.American == american && wf.Australian == australian).FirstOrDefault();
+            _context.SaveChanges();
+            return item.TranscriptionID;
         }
         public int? AddWordsCategory(string name, string abbr)
         {
@@ -98,7 +140,7 @@ namespace Server.Service
             book.Authors.Add(auth);
             _context.SaveChanges();
         }        
-        public void AddItemCategory(int item, int cat, ServerData data)
+        public void AddItemData(int item, int cat, ServerData data)
         {
             switch (data)
             {
@@ -107,13 +149,47 @@ namespace Server.Service
                         return;
                     _context.Videos.Where(u => u.Id == item).FirstOrDefault().Categories.Add(_context.VideoCategories.Where(u => u.Id == cat).FirstOrDefault());
                     break;
-
                 case ServerData.BookCategory:
                     Book book = (_context.Books.Where(u => u.Id == item).FirstOrDefault());
                     BookCategory bookCategory = _context.BookCategories.Where(u => u.Id == cat).FirstOrDefault();
                     if (book == null || bookCategory == null)
                         return;
                     book.Categories.Add(bookCategory);
+                    break;
+                case ServerData.WordCategory:
+                    Word word = (_context.Dictionary.Where(u => u.Id == item).FirstOrDefault());
+                    WordCategory wCategory = _context.WordCategories.Where(u => u.Id == cat).FirstOrDefault();
+                    if (word == null || wCategory == null)
+                        return;
+                    word.Categories.Add(wCategory);
+                    break;
+                case ServerData.Translation:
+                    Word wordT = (_context.Dictionary.Where(u => u.Id == item).FirstOrDefault());
+                    Translation tr = _context.Translations.Where(u => u.Id == cat).FirstOrDefault();
+                    if (wordT == null || tr == null)
+                        return;
+                    wordT.Translations.Add(tr);
+                    break;
+                case ServerData.Definition:
+                    Word wordD = (_context.Dictionary.Where(u => u.Id == item).FirstOrDefault());
+                    Definition def = _context.Definitions.Where(u => u.Id == cat).FirstOrDefault();
+                    if (wordD == null || def == null)
+                        return;
+                    wordD.Descriptions.Add(def);
+                    break;
+                case ServerData.Group:
+                    Word wordG = (_context.Dictionary.Where(u => u.Id == item).FirstOrDefault());
+                    WordsGroup gr = _context.Groups.Where(u => u.Id == cat).FirstOrDefault();
+                    if (wordG == null || gr == null)
+                        return;
+                    wordG.Groups.Add(gr);
+                    break;
+                case ServerData.Example:
+                    Word wordE = (_context.Dictionary.Where(u => u.Id == item).FirstOrDefault());
+                    Example ex = _context.Examples.Where(u => u.Id == cat).FirstOrDefault();
+                    if (wordE == null || ex == null)
+                        return;
+                    ex.WordID = wordE.Id;
                     break;
             }
             _context.SaveChanges();
@@ -126,6 +202,31 @@ namespace Server.Service
                 _context.Bookmarks.Where(bm => bm.BookID == item && bm.UserID == user).FirstOrDefault().Position = pos;
             else
                 _context.Bookmarks.Add(new Bookmark { Position = pos, BookID = item, UserID = user });
+            _context.SaveChanges();
+        }
+        public void AddItemsWord(int word, int item, ServerData type)
+        {
+            Word tmp = _context.Dictionary.Where(w => w.Id == word).FirstOrDefault();
+            if (tmp == null)
+                return;
+            switch (type)
+            {
+                case ServerData.Video:
+                    Video video = _context.Videos.Where(w => w.Id == item).FirstOrDefault();
+                    if (video != null && !video.Words.Contains(tmp))
+                        video.Words.Add(tmp);
+                    break;
+                case ServerData.Book:
+                    Book book = _context.Books.Where(w => w.Id == item).FirstOrDefault();
+                    if (book != null && !book.Words.Contains(tmp))
+                        book.Words.Add(tmp);
+                    break;
+                case ServerData.User:
+                    User user = _context.Users.Where(w => w.Id == item).FirstOrDefault();
+                    if (user != null && !user.Words.Contains(tmp))
+                        user.Words.Add(tmp);
+                    break;
+            }
             _context.SaveChanges();
         }
         #endregion
@@ -157,7 +258,41 @@ namespace Server.Service
                             break;
                     }
                     break;
-
+                case ServerData.Word:
+                    Word word = _context.Dictionary.Where(w => w.Id == id).FirstOrDefault();
+                    if (word == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            word.Name = changes;
+                            break;
+                        case PropertyData.Imgpath:
+                            word.ImgPath = changes;
+                            break;
+                        case PropertyData.PastForm:
+                            word.Form.PastForm = changes;
+                            break;
+                        case PropertyData.PastThForm:
+                            word.Form.PastThForm = changes;
+                            break;
+                        case PropertyData.PluralForm:
+                            word.Form.PluralForm = changes;
+                            break;
+                        case PropertyData.British:
+                            word.Transcriptions.British = changes;
+                            break;
+                        case PropertyData.American:
+                            word.Transcriptions.American = changes;
+                            break;
+                        case PropertyData.Australian:
+                            word.Transcriptions.Australian = changes;
+                            break;
+                        case PropertyData.Canadian:
+                            word.Transcriptions.Canadian = changes;
+                            break;
+                    }
+                    break;
                 case ServerData.Book:
                     Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
                     if (book == null)
@@ -176,8 +311,6 @@ namespace Server.Service
                             book.Path = changes;
                             break;
                         case PropertyData.Imgpath:
-                            if (File.Exists($@"BookImages\{book.ImgPath}"))
-                                File.Delete($@"BookImages\{book.ImgPath}");
                             book.ImgPath = changes;
                             break;
                         case PropertyData.Year:
@@ -191,7 +324,40 @@ namespace Server.Service
                             break;
                     }
                     break;
-
+                case ServerData.Video:
+                    Video video = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
+                    if (video == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            video.Name = changes;
+                            break;
+                        case PropertyData.Description:
+                            video.Description = changes;
+                            break;
+                        case PropertyData.Path:
+                            if (File.Exists($@"Books\{video.Path}") && video.IsAbsolute == false)
+                                File.Delete($@"Books\{video.Path}");
+                            video.Path = changes;
+                            break;
+                        case PropertyData.SubPath:
+                            video.SubPath = changes;
+                            break;
+                        case PropertyData.Imgpath:
+                            video.ImgPath = changes;
+                            break;
+                        case PropertyData.Year:
+                            if (changes == null)
+                                video.Year = null;
+                            else
+                                video.Year = Convert.ToInt32(changes);
+                            break;
+                        case PropertyData.IsAbsolute:
+                            video.IsAbsolute = changes != null;
+                            break;
+                    }
+                    break;
                 case ServerData.Author:
                     Author author = _context.Authors.Where(u => u.Id == id).FirstOrDefault();
                     if (author == null)
@@ -337,6 +503,21 @@ namespace Server.Service
                 case ServerData.Author:
                     _context.Books.Where(b => b.Id == id).FirstOrDefault()?.Authors.Clear();
                     break;
+                case ServerData.WordCategory:
+                    _context.Dictionary.Where(b => b.Id == id).FirstOrDefault()?.Categories.Clear();
+                    break;
+                case ServerData.Translation:
+                    _context.Dictionary.Where(b => b.Id == id).FirstOrDefault()?.Translations.Clear();
+                    break;
+                case ServerData.Definition:
+                    _context.Dictionary.Where(b => b.Id == id).FirstOrDefault()?.Descriptions.Clear();
+                    break;
+                case ServerData.Group:
+                    _context.Dictionary.Where(b => b.Id == id).FirstOrDefault()?.Groups.Clear();
+                    break;
+                case ServerData.Example:
+                    _context.Examples.RemoveRange(_context.Examples.Where(b => b.WordID == id).ToList());
+                    break;
             }
             _context.SaveChanges();
         }
@@ -381,6 +562,22 @@ namespace Server.Service
                         }
                     }
                     break;
+            }
+            _context.SaveChanges();
+        }
+        public void ClearResources()
+        {
+            List<Translation> lst = _context.Translations.ToList();
+            for (int i = 0; i < lst.Count; i++)
+            {
+                if (lst[i].Words?.Count == 0)
+                    _context.Translations.Remove(_context.Translations.ElementAt(i));
+            }
+            List<Definition> def = _context.Definitions.ToList();
+            for (int i = 0; i < def.Count; i++)
+            {
+                if (def[i].Words?.Count == 0)
+                    _context.Definitions.Remove(_context.Definitions.ElementAt(i));
             }
             _context.SaveChanges();
         }

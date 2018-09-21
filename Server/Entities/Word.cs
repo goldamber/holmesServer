@@ -40,7 +40,7 @@ namespace Server.Entities
         [DataMember]
         public virtual List<Translation> Translations { get; set; }
         [DataMember]
-        public virtual List<Definition> Descriptions { get; set; }        
+        public virtual List<Definition> Descriptions { get; set; }
         [DataMember]
         public virtual List<Video> Videos { get; set; }
         [DataMember]

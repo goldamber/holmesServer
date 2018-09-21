@@ -33,6 +33,8 @@ namespace Server.Database
             context.WordCategories.Add(new WordCategory { Name = "Compound noun", Abbreviation = "cn." });
             context.WordCategories.Add(new WordCategory { Name = "Verb", Abbreviation = "v." });
             context.WordCategories.Add(new WordCategory { Name = "Helping verb", Abbreviation = "hv." });
+            context.WordCategories.Add(new WordCategory { Name = "Regular verb", Abbreviation = "rv." });
+            context.WordCategories.Add(new WordCategory { Name = "Irregular verb", Abbreviation = "irv." });
             context.WordCategories.Add(new WordCategory { Name = "Linking verb", Abbreviation = "lv." });
             context.WordCategories.Add(new WordCategory { Name = "Compound verb", Abbreviation = "cv." });
             context.WordCategories.Add(new WordCategory { Name = "Phrasal verb", Abbreviation = "phrv." });

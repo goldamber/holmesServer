@@ -57,13 +57,43 @@ namespace Server.Service
         [OperationContract]
         int? AddAuthor(string name, string surname);
         /// <summary>
+        /// Inserts a new word into the database.
+        /// </summary>
+        /// <param name="name">Words name.</param>
+        /// <param name="img">Words image.</param>
+        /// <param name="user">Users id.</param>
+        /// <returns>Returns the Id of an added 'Word', if the operation succeeded.</returns>
+        [OperationContract]
+        int? AddWord(string name, string img, int user);
+        /// <summary>
+        /// Inserts data to a word.
+        /// </summary>
+        /// <param name="word">Words id.</param>
+        /// <param name="past">Past form.</param>
+        /// <param name="plural">Plural form.</param>
+        /// <param name="pastTh">Past participle.</param>
+        /// <returns>Returns the Id of an added data, if the operation succeeded.</returns>
+        [OperationContract]
+        int? AddWordsForm(int word, string past, string plural, string pastTh);
+        /// <summary>
+        /// Inserts data to a word.
+        /// </summary>
+        /// <param name="word">Words id.</param>
+        /// <param name="canadian">Canadian form.</param>
+        /// <param name="american">American form.</param>
+        /// <param name="british">British form.</param>
+        /// <param name="australian">Australian form.</param>
+        /// <returns>Returns the Id of an added data, if the operation succeeded.</returns>
+        [OperationContract]
+        int? AddWordsTranscription(int word, string british, string canadian, string american, string australian);
+        /// <summary>
         /// Inserts a new 'Category' item.
         /// </summary>
         /// <param name="name">The name of a category.</param>
         /// <param name="data">Describes the type of an item ('VideoCategory' OR 'BideoCategory').</param>
         /// <returns>Returns the Id of an added 'Author', if the operation succeeded.</returns>
         [OperationContract]
-        int? AddCategory(string name, ServerData data);
+        int? AddData(string name, ServerData data);
         /// <summary>
         /// Inserts a new 'WordCategory' item.
         /// </summary>
@@ -80,6 +110,14 @@ namespace Server.Service
         /// <param name="user">Users id.</param>
         [OperationContract]
         void AddBookmark(int pos, int item, int user);
+        /// <summary>
+        /// Create a connection between word and item.
+        /// </summary>
+        /// <param name="word">Words id.</param>
+        /// <param name="item">Items id.</param>
+        /// <param name="type">Items type.</param>
+        [OperationContract]
+        void AddItemsWord(int word, int item, ServerData type);
 
         /// <summary>
         /// Adds a category to the books or videos.
@@ -88,7 +126,7 @@ namespace Server.Service
         /// <param name="cat">The id of a category.</param>
         /// <param name="data">>Describes the type of a category ('VideoCategory' OR 'BideoCategory').</param>
         [OperationContract]
-        void AddItemCategory(int item, int cat, ServerData data);
+        void AddItemData(int item, int cat, ServerData data);
         /// <summary>
         /// Adds an author to a book.
         /// </summary>
@@ -165,12 +203,12 @@ namespace Server.Service
         [OperationContract]
         int? GetMark(int itemId, int userId, ServerData data);
         /// <summary>
-        /// Returns the last tabels id.
+        /// Returns words id.
         /// </summary>
-        /// <param name="data">Items type.</param>
-        /// <returns>Future id of an item to be addded.</returns>
+        /// <param name="data">Search string.</param>
+        /// <returns>Id of the word.</returns>
         [OperationContract]
-        int GetLastId(ServerData data);
+        int? GetWord(string data);
 
         /// <summary>
         /// Gets a list of all items.
@@ -217,12 +255,13 @@ namespace Server.Service
         IEnumerable<int> GetItemData(int id, ServerData data, ServerData res);
 
         /// <summary>
-        /// Returns the id of the user.
+        /// Returns the id of an item.
         /// </summary>
-        /// <param name="login">The login of the user.</param>
-        /// <returns>If given user exists, then returns users id. Unless - NULL.</returns>
+        /// <param name="name">The name of item.</param>
+        /// <param name="type">Items type.</param>
+        /// <returns>If given item exists, then returns users id. Unless - NULL.</returns>
         [OperationContract]
-        int? GetUserId(string login);
+        int? GetItemsId(string name, ServerData type);
         /// <summary>
         /// Returns bookmark if exists.
         /// </summary>
@@ -305,6 +344,11 @@ namespace Server.Service
         /// <param name="data">The type of an item.</param>
         [OperationContract]
         void RemoveItemWord(int item, int word, ServerData data);
+        /// <summary>
+        /// Removes all data that is not in use anymore.
+        /// </summary>
+        [OperationContract]
+        void ClearResources();
         #endregion
     }
 }
