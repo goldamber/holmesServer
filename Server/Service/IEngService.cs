@@ -66,6 +66,14 @@ namespace Server.Service
         [OperationContract]
         int? AddWord(string name, string img, int user);
         /// <summary>
+        /// Inserts a new grammar into the database.
+        /// </summary>
+        /// <param name="name">Grammars name.</param>
+        /// <param name="desc">Grammars description.</param>
+        /// <returns>Returns the Id of an added 'Grammar', if the operation succeeded.</returns>
+        [OperationContract]
+        int? AddGrammar(string name, string desc);
+        /// <summary>
         /// Inserts data to a word.
         /// </summary>
         /// <param name="word">Words id.</param>

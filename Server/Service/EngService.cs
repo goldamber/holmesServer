@@ -9,13 +9,6 @@ using System.Linq;
 
 namespace Server.Service
 {
-    //Types of data, that can be used for the general actions (insert, remove, edit, view).
-    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group, Transcription }
-    //Describes the properties, that have to be sent to the client.
-    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Homophones, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Word, Words, Video, Videos, Example, Examples, Transcription, British, American, Australian, Canadian }
-    //Types of files to be uploaded or downloaded.
-    public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
-
     public partial class EngService : IEngService
     {
         EngContext _context;
@@ -71,6 +64,12 @@ namespace Server.Service
             _context.SaveChanges();
             return _context.Dictionary.Where(a => a.Name == name && a.ImgPath == img).FirstOrDefault()?.Id;
         }
+        public int? AddGrammar(string name, string desc)
+        {
+            _context.Grammars.Add(new Grammar { Title = name, Description = desc });
+            _context.SaveChanges();
+            return _context.Grammars.Where(a => a.Title == name).FirstOrDefault()?.Id;
+        }
         public int? AddData(string name, ServerData data)
         {
             switch (data)
@@ -99,6 +98,18 @@ namespace Server.Service
                     _context.Examples.Add(new Example { Name = name });
                     _context.SaveChanges();
                     return _context.Examples.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.GrammarExample:
+                    _context.GrammarExamples.Add(new GrammarExample { Name = name });
+                    _context.SaveChanges();
+                    return _context.GrammarExamples.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.GrammarException:
+                    _context.Exceptions.Add(new GrammarException { Name = name });
+                    _context.SaveChanges();
+                    return _context.Exceptions.Where(b => b.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Rule:
+                    _context.Rules.Add(new Entities.Rule { Name = name });
+                    _context.SaveChanges();
+                    return _context.Rules.Where(b => b.Name == name).FirstOrDefault()?.Id;
             }
             return null;
         }
@@ -190,6 +201,27 @@ namespace Server.Service
                     if (wordE == null || ex == null)
                         return;
                     ex.WordID = wordE.Id;
+                    break;
+                case ServerData.GrammarExample:
+                    Grammar grammar = (_context.Grammars.Where(u => u.Id == item).FirstOrDefault());
+                    GrammarExample example = _context.GrammarExamples.Where(u => u.Id == cat).FirstOrDefault();
+                    if (grammar == null || example == null)
+                        return;
+                    grammar.Examples.Add(example);
+                    break;
+                case ServerData.GrammarException:
+                    Grammar grammarE = (_context.Grammars.Where(u => u.Id == item).FirstOrDefault());
+                    GrammarException exception = _context.Exceptions.Where(u => u.Id == cat).FirstOrDefault();
+                    if (grammarE == null || exception == null)
+                        return;
+                    grammarE.Exceptions.Add(exception);
+                    break;
+                case ServerData.Rule:
+                    Grammar grammarR = (_context.Grammars.Where(u => u.Id == item).FirstOrDefault());
+                    Entities.Rule rule = _context.Rules.Where(u => u.Id == cat).FirstOrDefault();
+                    if (grammarR == null || rule == null)
+                        return;
+                    grammarR.Rules.Add(rule);
                     break;
             }
             _context.SaveChanges();
@@ -300,6 +332,20 @@ namespace Server.Service
                             break;
                         case PropertyData.Canadian:
                             word.Transcriptions.Canadian = changes;
+                            break;
+                    }
+                    break;
+                case ServerData.Grammar:
+                    Grammar grammar = _context.Grammars.Where(w => w.Id == id).FirstOrDefault();
+                    if (grammar == null)
+                        return;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            grammar.Title = changes;
+                            break;
+                        case PropertyData.Description:
+                            grammar.Description = changes;
                             break;
                     }
                     break;
@@ -472,6 +518,10 @@ namespace Server.Service
                     if (_context.Dictionary.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Dictionary.Remove(_context.Dictionary.Where(b => b.Id == id).FirstOrDefault());
                     break;
+                case ServerData.Grammar:
+                    if (_context.Grammars.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Grammars.Remove(_context.Grammars.Where(b => b.Id == id).FirstOrDefault());
+                    break;
                 case ServerData.Author:
                     if (_context.Authors.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Authors.Remove(_context.Authors.Where(b => b.Id == id).FirstOrDefault());
@@ -495,6 +545,18 @@ namespace Server.Service
                 case ServerData.Group:
                     if (_context.Groups.Where(b => b.Id == id).FirstOrDefault() != null)
                         _context.Groups.Remove(_context.Groups.Where(b => b.Id == id).FirstOrDefault());
+                    break;
+                case ServerData.GrammarExample:
+                    if (_context.GrammarExamples.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.GrammarExamples.Remove(_context.GrammarExamples.Where(b => b.Id == id).FirstOrDefault());
+                    break;
+                case ServerData.GrammarException:
+                    if (_context.Exceptions.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Exceptions.Remove(_context.Exceptions.Where(b => b.Id == id).FirstOrDefault());
+                    break;
+                case ServerData.Rule:
+                    if (_context.Rules.Where(b => b.Id == id).FirstOrDefault() != null)
+                        _context.Rules.Remove(_context.Rules.Where(b => b.Id == id).FirstOrDefault());
                     break;
             }
             
@@ -527,6 +589,15 @@ namespace Server.Service
                     break;
                 case ServerData.Example:
                     _context.Examples.RemoveRange(_context.Examples.Where(b => b.WordID == id).ToList());
+                    break;
+                case ServerData.GrammarExample:
+                    _context.Grammars.Where(b => b.Id == id).FirstOrDefault()?.Examples.Clear();
+                    break;
+                case ServerData.GrammarException:
+                    _context.Grammars.Where(b => b.Id == id).FirstOrDefault()?.Exceptions.Clear();
+                    break;
+                case ServerData.Rule:
+                    _context.Grammars.Where(b => b.Id == id).FirstOrDefault()?.Rules.Clear();
                     break;
             }
             _context.SaveChanges();
@@ -590,41 +661,6 @@ namespace Server.Service
                     _context.Definitions.Remove(_context.Definitions.ElementAt(i));
             }
             _context.SaveChanges();
-        }
-        #endregion
-        #region Upload/Download.
-        public byte[] Download(string name, FilesType type)
-        {
-            if (File.Exists($@"{type.ToString()}\{name}"))
-                return File.ReadAllBytes($@"{type.ToString()}\{name}");
-            return null;
-        }
-        public bool Upload(byte[] file, string name, FilesType type)
-        {
-            try
-            {
-                string fileName = "";
-                if (!Directory.Exists(type.ToString()))
-                    Directory.CreateDirectory(type.ToString());
-                fileName = $@"{type.ToString()}\{name}";
-
-                using (FileStream fs = File.Create(fileName))
-                {
-                    fs.Write(file, 0, file.Length);
-                    fs.Dispose();
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-        }
-        public void Delete(string name, FilesType type)
-        {
-            if (File.Exists($@"{type.ToString()}\{name}"))
-                File.Delete($@"{type.ToString()}\{name}");
         }
         #endregion
     }

@@ -34,14 +34,14 @@ namespace Server.Service
                     return _context.Authors.Select(f => f.Id).ToList();
                 case ServerData.Game:
                     return _context.Games.Select(f => f.Id).ToList();
+                case ServerData.Grammar:
+                    return _context.Grammars.Select(f => f.Id).ToList();
             }
-
             return null;
         }
         public IEnumerable<int> GetFItems(string filter, ServerData data, PropertyData fil)
         {
             filter = filter.ToLower();
-
             switch (data)
             {
                 case ServerData.Video:
@@ -347,9 +347,20 @@ namespace Server.Service
                     }
                     break;
                 case ServerData.Game:
-                    return _context.Games.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                    switch (fil)
+                    {
+                        case PropertyData.Name:
+                            return _context.Games.Where(v => v.Name.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                    }
+                    break;
+                case ServerData.Grammar:
+                    switch (fil)
+                    {
+                        case PropertyData.Name:
+                            return _context.Grammars.Where(v => v.Title.ToLower().Contains(filter)).Select(f => f.Id).ToList();
+                    }
+                    break;
             }
-
             return null;
         }
         public IEnumerable<int> GetSortedItems(ServerData data, PropertyData property, bool desc)
@@ -457,8 +468,21 @@ namespace Server.Service
                             return desc ? _context.Dictionary.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Dictionary.OrderBy(v => v.Name).Select(v => v.Id).ToList();
                     }
                     break;
+                case ServerData.Game:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Games.OrderByDescending(v => v.Name).Select(v => v.Id).ToList() : _context.Games.OrderBy(v => v.Name).Select(v => v.Id).ToList();
+                    }
+                    break;
+                case ServerData.Grammar:
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return desc ? _context.Grammars.OrderByDescending(v => v.Title).Select(v => v.Id).ToList() : _context.Grammars.OrderBy(v => v.Title).Select(v => v.Id).ToList();
+                    }
+                    break;
             }
-
             return null;
         }
         public IEnumerable<int> GetUserItemWords(int user, int item, ServerData data)
@@ -495,7 +519,6 @@ namespace Server.Service
                             return video.Words.Count == 0 ? null : video.Words.Select(w => w.Id);
                     }
                     break;
-
                 case ServerData.Book:
                     Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
                     if (book == null)
@@ -510,7 +533,20 @@ namespace Server.Service
                             return book.Words.Count == 0? null: book.Words.Select(w => w.Id);
                     }
                     break;
-
+                case ServerData.Grammar:
+                    Grammar grammar = _context.Grammars.Where(u => u.Id == id).FirstOrDefault();
+                    if (grammar == null)
+                        return null;
+                    switch (res)
+                    {
+                        case ServerData.Rule:
+                            return grammar.Rules.Count == 0? null : grammar.Rules.Select(c => c.Id);
+                        case ServerData.GrammarExample:
+                            return grammar.Examples.Count == 0? null : grammar.Examples.Select(c => c.Id);
+                        case ServerData.GrammarException:
+                            return grammar.Exceptions.Count == 0 ? null : grammar.Exceptions.Select(w => w.Id);
+                    }
+                    break;
                 case ServerData.Word:
                     Word word = _context.Dictionary.Where(u => u.Id == id).FirstOrDefault();
                     if (word == null)
@@ -530,7 +566,6 @@ namespace Server.Service
                             return _context.Examples.Where(e => e.WordID == word.Id).Select(e => e.Id);
                     }
                     break;
-
                 case ServerData.Author:
                     Author author = _context.Authors.Where(u => u.Id == id).FirstOrDefault();
                     if (author == null)
@@ -541,7 +576,6 @@ namespace Server.Service
                             return author.Books.Select(c => c.Id);
                     }
                     break;
-
                 case ServerData.BookCategory:
                     BookCategory bc = _context.BookCategories.Where(u => u.Id == id).FirstOrDefault();
                     if (bc == null)
@@ -552,7 +586,6 @@ namespace Server.Service
                             return bc.Books.Select(c => c.Id);
                     }
                     break;
-
                 case ServerData.VideoCategory:
                     VideoCategory vc = _context.VideoCategories.Where(u => u.Id == id).FirstOrDefault();
                     if (vc == null)
@@ -584,7 +617,6 @@ namespace Server.Service
                     }
                     break;
             }
-
             return null;
         }
         #endregion

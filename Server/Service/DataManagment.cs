@@ -1,9 +1,18 @@
 ﻿using Server.Entities;
+using System;
 using System.Data;
+using System.IO;
 using System.Linq;
 
 namespace Server.Service
 {
+    //Types of data, that can be used for the general actions (insert, remove, edit, view).
+    public enum ServerData { Video, Book, User, Role, VideoCategory, BookCategory, Word, WordForm, WordCategory, Translation, Definition, Author, Game, Example, Bookmark, VideoBookmark, Group, Transcription, GrammarExample, Grammar, GrammarException, Rule }
+    //Describes the properties, that have to be sent to the client.
+    public enum PropertyData { Name, Surname, Login, Abbreviation, Role, RolesName, Description, Path, IsAbsolute, SubPath, Imgpath, Mark, Created, Date, Position, ScoreCount, Password, Level, Year, PastForm, PastThForm, PluralForm, Category, Categories, Author, Authors, Synonyms, Homophones, Translation, Translations, Definition, Definitions, Group, Groups, Book, Books, Word, Words, Video, Videos, Example, Examples, Transcription, British, American, Australian, Canadian }
+    //Types of files to be uploaded or downloaded.
+    public enum FilesType { Videos, Avatars, BooksImages, WordsImages, VideosImages, Books, Subtitles }
+
     public partial class EngService : IEngService
     {
         #region Get data.
@@ -33,12 +42,10 @@ namespace Server.Service
                             return video.Created.ToLongDateString();
                     }
                     break;
-
                 case ServerData.Book:
                     Book book = _context.Books.Where(u => u.Id == id).FirstOrDefault();
                     if (book == null)
                         return null;
-
                     switch (property)
                     {
                         case PropertyData.Name:
@@ -55,18 +62,62 @@ namespace Server.Service
                             return book.Created.ToLongDateString();
                     }
                     break;
-
-                case ServerData.Role:
-                    Role role = _context.Roles.Where(u => u.Id == id).FirstOrDefault();
-                    if (role == null)
+                case ServerData.Game:
+                    Game game = _context.Games.Where(u => u.Id == id).FirstOrDefault();
+                    if (game == null)
                         return null;
                     switch (property)
                     {
                         case PropertyData.Name:
-                            return role.Name;
+                            return game.Name;
+                        case PropertyData.Description:
+                            return game.Description;
                     }
                     break;
-
+                case ServerData.Grammar:
+                    Grammar grammar = _context.Grammars.Where(u => u.Id == id).FirstOrDefault();
+                    if (grammar == null)
+                        return null;
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return grammar.Title;
+                        case PropertyData.Description:
+                            return grammar.Description;
+                    }
+                    break;
+                case ServerData.Rule:
+                    Entities.Rule rule = _context.Rules.Where(u => u.Id == id).FirstOrDefault();
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return rule?.Name;
+                    }
+                    break;
+                case ServerData.GrammarExample:
+                   GrammarExample ge = _context.GrammarExamples.Where(u => u.Id == id).FirstOrDefault();
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return ge?.Name;
+                    }
+                    break;
+                case ServerData.GrammarException:
+                    GrammarException gex = _context.Exceptions.Where(u => u.Id == id).FirstOrDefault();
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return gex?.Name;
+                    }
+                    break;
+                case ServerData.Role:
+                    Role role = _context.Roles.Where(u => u.Id == id).FirstOrDefault();
+                    switch (property)
+                    {
+                        case PropertyData.Name:
+                            return role?.Name;
+                    }
+                    break;
                 case ServerData.User:
                     User user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
                     if (user == null)
@@ -212,18 +263,6 @@ namespace Server.Service
                             return author.Surname;
                     }
                     break;
-                case ServerData.Game:
-                    Game game = _context.Games.Where(u => u.Id == id).FirstOrDefault();
-                    if (game == null)
-                        return null;
-                    switch (property)
-                    {
-                        case PropertyData.Name:
-                            return game.Name;
-                        case PropertyData.Description:
-                            return game.Description;
-                    }
-                    break;
                 case ServerData.Example:
                     Example example = _context.Examples.Where(u => u.Id == id).FirstOrDefault();
                     if (example == null)
@@ -291,6 +330,12 @@ namespace Server.Service
                     return _context.Examples.Where(u => u.Name == name).FirstOrDefault()?.Id;
                 case ServerData.Group:
                     return _context.Groups.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.GrammarExample:
+                    return _context.GrammarExamples.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.GrammarException:
+                    return _context.Exceptions.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Rule:
+                    return _context.Rules.Where(u => u.Name == name).FirstOrDefault()?.Id;
                 default:
                     return null;
             }
@@ -368,6 +413,14 @@ namespace Server.Service
                     return _context.Groups.Where(u => u.Name == name).FirstOrDefault() != null;
                 case ServerData.Word:
                     return _context.Dictionary.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.Grammar:
+                    return _context.Grammars.Where(u => u.Title == name).FirstOrDefault() != null;
+                case ServerData.Rule:
+                    return _context.Rules.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.GrammarExample:
+                    return _context.GrammarExamples.Where(u => u.Name == name).FirstOrDefault() != null;
+                case ServerData.GrammarException:
+                    return _context.Exceptions.Where(u => u.Name == name).FirstOrDefault() != null;
             }
 
             return false;
@@ -383,6 +436,41 @@ namespace Server.Service
                 return false;
 
             return tmp.Password == pswd;
+        }
+        #endregion
+        #region Upload/Download.
+        public byte[] Download(string name, FilesType type)
+        {
+            if (File.Exists($@"{type.ToString()}\{name}"))
+                return File.ReadAllBytes($@"{type.ToString()}\{name}");
+            return null;
+        }
+        public bool Upload(byte[] file, string name, FilesType type)
+        {
+            try
+            {
+                string fileName = "";
+                if (!Directory.Exists(type.ToString()))
+                    Directory.CreateDirectory(type.ToString());
+                fileName = $@"{type.ToString()}\{name}";
+
+                using (FileStream fs = File.Create(fileName))
+                {
+                    fs.Write(file, 0, file.Length);
+                    fs.Dispose();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+        public void Delete(string name, FilesType type)
+        {
+            if (File.Exists($@"{type.ToString()}\{name}"))
+                File.Delete($@"{type.ToString()}\{name}");
         }
         #endregion
     }

@@ -6,6 +6,10 @@ namespace Server.Database
     public class EngContext : DbContext
     {
         public DbSet<Word> Dictionary { get; set; }
+        public DbSet<Grammar> Grammars { get; set; }
+        public DbSet<Rule> Rules { get; set; }
+        public DbSet<GrammarExample> GrammarExamples { get; set; }
+        public DbSet<GrammarException> Exceptions { get; set; }
         public DbSet<WordForm> WordForms { get; set; }
         public DbSet<Transcription> Transcriptions { get; set; }
         public DbSet<WordCategory> WordCategories { get; set; }

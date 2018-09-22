@@ -8,7 +8,7 @@ namespace Server.Database
     {
         protected override void Seed(EngContext context)
         {
-            #region Roles.
+            /*#region Roles.
             context.Roles.Add(new Role { Name = "admin" });
             context.Roles.Add(new Role { Name = "user" });
             #endregion
@@ -147,7 +147,7 @@ namespace Server.Database
             context.VideoStars.Add(new VideoStar { MarkCount = 2, UserName = val, VideoName = tmp });
             context.BookStars.Add(new BookStar { MarkCount = 3, UserName = val, BookName = _book });
             #endregion
-            context.SaveChanges();
+            context.SaveChanges();*/
 
             base.Seed(context);
         }

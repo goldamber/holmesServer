@@ -61,6 +61,10 @@
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\BookStar.cs" />
     <Compile Include="Entities\EntityTable.cs" />
+    <Compile Include="Entities\Grammar.cs" />
+    <Compile Include="Entities\GrammarExample.cs" />
+    <Compile Include="Entities\GrammarException.cs" />
+    <Compile Include="Entities\Rule.cs" />
     <Compile Include="Entities\VideoStar.cs" />
     <Compile Include="Entities\Transcription.cs" />
     <Compile Include="Entities\WordsGroup.cs" />
