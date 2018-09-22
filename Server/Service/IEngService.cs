@@ -111,6 +111,14 @@ namespace Server.Service
         [OperationContract]
         void AddBookmark(int pos, int item, int user);
         /// <summary>
+        /// Inserts a new video bookmark.
+        /// </summary>
+        /// <param name="pos">Position.</param>
+        /// <param name="item">Videos id.</param>
+        /// <param name="user">Users id.</param>
+        [OperationContract]
+        void AddVideoBookmark(TimeSpan pos, int item, int user);
+        /// <summary>
         /// Create a connection between word and item.
         /// </summary>
         /// <param name="word">Words id.</param>

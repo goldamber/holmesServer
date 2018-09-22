@@ -30,7 +30,7 @@ namespace Server.Entities
         public DateTime Created { get; set; } = DateTime.Today;
         [DataMember]
         public string Path { get; set; } = null;
-        [DataMember, Required]
+        [DataMember]
         public string SubPath { get; set; }
         [DataMember]
         public string ImgPath { get; set; } = "WolfV.png";

@@ -13,7 +13,7 @@ namespace Server.Entities
     public class VideoBookmark : EntityTable
     {
         [DataMember]
-        public DateTime Position { get; set; }
+        public TimeSpan Position { get; set; }
 
         [DataMember]
         public int UserID { get; set; }

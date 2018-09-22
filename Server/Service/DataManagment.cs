@@ -15,7 +15,6 @@ namespace Server.Service
                     Video video = _context.Videos.Where(u => u.Id == id).FirstOrDefault();
                     if (video == null)
                         return null;
-
                     switch (property)
                     {
                         case PropertyData.Name:

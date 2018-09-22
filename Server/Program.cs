@@ -18,7 +18,7 @@ namespace Server
 
                 Database.EngContext _context = new Database.EngContext();
                 _context.Database.Connection.ConnectionString = ConfigurationManager.ConnectionStrings["engEntDB"].ConnectionString;
-                System.Data.Entity.Database.SetInitializer(new Database.DBSeeder());
+                //System.Data.Entity.Database.SetInitializer(new Database.DBSeeder());
                 _context.Games.Load();
 
                 WriteLine("Service is running!");

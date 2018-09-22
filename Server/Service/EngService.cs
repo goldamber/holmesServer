@@ -204,6 +204,16 @@ namespace Server.Service
                 _context.Bookmarks.Add(new Bookmark { Position = pos, BookID = item, UserID = user });
             _context.SaveChanges();
         }
+        public void AddVideoBookmark(TimeSpan pos, int item, int user)
+        {
+            if (_context.Users.Where(u => u.Id == user).FirstOrDefault() == null || _context.Videos.Where(b => b.Id == item).FirstOrDefault() == null)
+                return;
+            if (_context.VideoBookmarks.Where(bm => bm.VideoID == item && bm.UserID == user).FirstOrDefault() != null)
+                _context.VideoBookmarks.Where(bm => bm.VideoID == item && bm.UserID == user).FirstOrDefault().Position = pos;
+            else
+                _context.VideoBookmarks.Add(new VideoBookmark { Position = pos, VideoID = item, UserID = user });
+            _context.SaveChanges();
+        }
         public void AddItemsWord(int word, int item, ServerData type)
         {
             Word tmp = _context.Dictionary.Where(w => w.Id == word).FirstOrDefault();
