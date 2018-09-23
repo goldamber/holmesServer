@@ -619,6 +619,17 @@ namespace Server.Service
             }
             return null;
         }
+        public Dictionary<int, int> GetHighScores(int game)
+        {
+            if (_context.Games.Where(g => g.Id == game).FirstOrDefault() == null)
+                return null;
+            Dictionary<int, int> lst = new Dictionary<int, int>();
+            foreach (Score item in _context.Scores.Where(s => s.GameID == game).OrderByDescending(s => s.ScoreCount).ToList())
+            {
+                lst.Add(item.UserID, item.ScoreCount);
+            }
+            return lst;
+        }
         #endregion
     }
 }

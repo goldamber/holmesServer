@@ -131,6 +131,13 @@ namespace Server.Service
                             return user.Avatar;
                         case PropertyData.Password:
                             return user.Password;
+                        case PropertyData.ScoreCount:
+                            int score = 0;
+                            foreach (Score item in _context.Scores.Where(s => s.UserID == user.Id).ToList())
+                            {
+                                score += item.ScoreCount;
+                            }
+                            return score.ToString();
                         case PropertyData.Level:
                             return user.Level.ToString();
                         case PropertyData.Role:
@@ -336,6 +343,8 @@ namespace Server.Service
                     return _context.Exceptions.Where(u => u.Name == name).FirstOrDefault()?.Id;
                 case ServerData.Rule:
                     return _context.Rules.Where(u => u.Name == name).FirstOrDefault()?.Id;
+                case ServerData.Game:
+                    return _context.Games.Where(u => u.Name.ToLower() == name.ToLower()).FirstOrDefault()?.Id;
                 default:
                     return null;
             }

@@ -134,7 +134,14 @@ namespace Server.Service
         /// <param name="type">Items type.</param>
         [OperationContract]
         void AddItemsWord(int word, int item, ServerData type);
-
+        /// <summary>
+        /// Sets scor for a game to user.
+        /// </summary>
+        /// <param name="count">Score.</param>
+        /// <param name="user">Id of user.</param>
+        /// <param name="game">Id of game.</param>
+        [OperationContract]
+        void AddScore(int count, int user, int game);
         /// <summary>
         /// Adds a category to the books or videos.
         /// </summary>
@@ -250,7 +257,13 @@ namespace Server.Service
         /// <returns>List of items' ids.</returns>
         [OperationContract]
         IEnumerable<int> GetSortedItems(ServerData data, PropertyData property, bool desc);
-
+        /// <summary>
+        /// Get a list of high scores for specific game.
+        /// </summary>
+        /// <param name="game">Id of game.</param>
+        /// <returns>List of users and their scores.</returns>
+        [OperationContract]
+        Dictionary<int, int> GetHighScores(int game);
         /// <summary>
         /// Returns a list of the words related to a specific user and item (video or book).
         /// </summary>

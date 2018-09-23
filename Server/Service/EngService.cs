@@ -151,6 +151,14 @@ namespace Server.Service
             book.Authors.Add(auth);
             _context.SaveChanges();
         }        
+        public void AddScore(int count, int user, int game)
+        {
+            if (_context.Scores.Where(s => s.UserID == user && s.GameID == game).FirstOrDefault() == null)
+                _context.Scores.Add(new Score { ScoreCount = count, GameID = game, UserID = user });
+            else
+                _context.Scores.Where(s => s.UserID == user && s.GameID == game).FirstOrDefault().ScoreCount += count;
+            _context.SaveChanges();
+        }
         public void AddItemData(int item, int cat, ServerData data)
         {
             switch (data)
