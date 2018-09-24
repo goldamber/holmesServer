@@ -1,7 +1,5 @@
 ﻿using Server.Entities;
-using System;
 using System.Data;
-using System.IO;
 using System.Linq;
 
 namespace Server.Service
@@ -445,41 +443,6 @@ namespace Server.Service
                 return false;
 
             return tmp.Password == pswd;
-        }
-        #endregion
-        #region Upload/Download.
-        public byte[] Download(string name, FilesType type)
-        {
-            if (File.Exists($@"{type.ToString()}\{name}"))
-                return File.ReadAllBytes($@"{type.ToString()}\{name}");
-            return null;
-        }
-        public bool Upload(byte[] file, string name, FilesType type)
-        {
-            try
-            {
-                string fileName = "";
-                if (!Directory.Exists(type.ToString()))
-                    Directory.CreateDirectory(type.ToString());
-                fileName = $@"{type.ToString()}\{name}";
-
-                using (FileStream fs = File.Create(fileName))
-                {
-                    fs.Write(file, 0, file.Length);
-                    fs.Dispose();
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-        }
-        public void Delete(string name, FilesType type)
-        {
-            if (File.Exists($@"{type.ToString()}\{name}"))
-                File.Delete($@"{type.ToString()}\{name}");
         }
         #endregion
     }

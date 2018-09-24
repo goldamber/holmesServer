@@ -68,6 +68,7 @@
     <Compile Include="Entities\VideoStar.cs" />
     <Compile Include="Entities\Transcription.cs" />
     <Compile Include="Entities\WordsGroup.cs" />
+    <Compile Include="Service\AddActions.cs" />
     <Compile Include="Service\DataManagment.cs" />
     <Compile Include="Entities\Example.cs" />
     <Compile Include="Entities\Role.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Entities\Definition.cs" />
     <Compile Include="Database\EngContext.cs" />
     <Compile Include="Entities\Game.cs" />
+    <Compile Include="Service\GetLists.cs" />
     <Compile Include="Service\IEngService.cs" />
     <Compile Include="Service\EngService.cs" />
     <Compile Include="Program.cs" />
