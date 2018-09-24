@@ -282,6 +282,20 @@ namespace Server.Service
         /// <returns>List of items' ids.</returns>
         [OperationContract]
         IEnumerable<int> GetItemData(int id, ServerData data, ServerData res);
+        /// <summary>
+        /// Returns the list of tounge twisters.
+        /// </summary>
+        /// <returns>List of tounge twisters, if exists.</returns>
+        [OperationContract]
+        IEnumerable<int> GetToungeTwisters();
+        /// <summary>
+        /// Returns only words with images of given category.
+        /// </summary>
+        /// <param name="cat">Id of category.</param>
+        /// <param name="type">Type of category.</param>
+        /// <returns>List of words ids.</returns>
+        [OperationContract]
+        IEnumerable<int> GetWordsWithImages(int cat, ServerData type);
 
         /// <summary>
         /// Returns the id of an item.

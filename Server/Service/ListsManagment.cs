@@ -630,6 +630,31 @@ namespace Server.Service
             }
             return lst;
         }
+        public IEnumerable<int> GetToungeTwisters()
+        {
+            WordsGroup cat = _context.Groups.Where(c => c.Name == "Toungue twisters").FirstOrDefault();
+            if (cat == null)
+                return null;
+            return cat.Words.Count == 0 ? null : cat.Words.Select(w => w.Id).ToList();
+        }
+        public IEnumerable<int> GetWordsWithImages(int cat, ServerData type)
+        {
+            switch (type)
+            {
+                case ServerData.Group:
+                    WordsGroup group = _context.Groups.Where(g => g.Id == cat).FirstOrDefault();
+                    if (group == null)
+                        return null;
+                    return group.Words.Where(w => w.ImgPath != null).Select(w => w.Id).ToList();
+                case ServerData.WordCategory:
+                    WordCategory category = _context.WordCategories.Where(g => g.Id == cat).FirstOrDefault();
+                    if (category == null)
+                        return null;
+                    return category.Words.Where(w => w.ImgPath != null).Select(w => w.Id).ToList();
+                default:
+                    return null;
+            }
+        }
         #endregion
     }
 }
