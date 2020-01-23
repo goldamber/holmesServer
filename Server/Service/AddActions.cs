@@ -7,7 +7,9 @@ namespace Server.Service
 {
     public partial class EngService : IEngService
     {
+        // Actions responsible for adding elements.
         #region Add.
+            // Add data to database
         public int? AddAuthor(string name, string surname)
         {
             _context.Authors.Add(new Author { Name = name, Surname = surname });
